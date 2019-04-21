@@ -1,0 +1,46 @@
+.DS_STORE
+
+/dist/
+bazel-*
+e2e_test.*
+node_modules
+bower_components
+.idea
+tools/gulp-tasks/cldr/cldr-data/
+
+# Include when developing application packages.
+pubspec.lock
+.c9
+.idea/
+.settings/
+*.js.swp
+*.swo
+data/
+modules/.settings
+.bazelrc
+.vscode
+modules/.vscode
+
+# Don't check in secret files
+*config.js
+
+# Ignore npm/yarn debug log
+npm-debug.log
+yarn-error.log
+
+# build-analytics
+.build-analytics
+
+# rollup-test output
+/modules/rollup-test/dist/
+
+
+# upload folders
+uploads/map/file/*
+!uploads/map/file/.gitkeep
+uploads/map/images/*
+!uploads/map/images/.gitkeep
+uploads/map/xml/*
+!uploads/map/xml/.gitkeep
+uploads/workspace/*
+!uploads/workspace/.gitkeep
