@@ -35,7 +35,6 @@ module.exports = {
   },
 
   password_update: function(req, res) {
-    console.log(req.body);
     User.findOne({"_id": req.user.sub}, (err, user) => {
       if (err || !user) return res.status(500).send({message: "Ha ocurrido un error al actualizar tu contraseña."});
       bcrypt.compare(req.body.actual_password, user.password, (err, check) => {

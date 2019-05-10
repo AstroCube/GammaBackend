@@ -16,7 +16,7 @@ const user_tokenization = require("@user_tokenization");
 module.exports = {
 
   user_get: function(req, res) {
-    User.findOne({username_lowercase: req.params.username.toLowerCase()}).populate("group._id disguise_group").exec((err, user) => {
+    User.findOne({$or: [{username_lowercase: req.params.username.toLowerCase()}, {_id: req.params.username}]}).populate("group._id disguise_group").exec((err, user) => {
       if (err) return res.status(500).send({message: "Error obtaining user record."});
       return res.status(200).send(user);
     });
