@@ -12,11 +12,18 @@ const Punishment = require("@punishment");
 const redis = require("@redis_service");
 const User = require("@user");
 const user_tokenization = require("@user_tokenization");
+const Validator = require('mongoose').Types.ObjectId;
 
 module.exports = {
 
   user_get: function(req, res) {
-    User.findOne({$or: [{username_lowercase: req.params.username.toLowerCase()}, {_id: req.params.username}]}).populate("group._id disguise_group").exec((err, user) => {
+    let query;
+    if (Validator.isValid(req.params.username.toString())) {
+      query = {_id: req.params.username};
+    } else {
+      query = {username_lowercase: req.params.username.toLowerCase()};
+    }
+    User.findOne(query).populate("group._id disguise_group").exec((err, user) => {
       if (err) return res.status(500).send({message: "Error obtaining user record."});
       return res.status(200).send(user);
     });
