@@ -21,7 +21,7 @@ module.exports = {
     if (Validator.isValid(req.params.username.toString())) {
       query = {_id: req.params.username};
     } else {
-      query = {username_lowercase: req.params.username.toLowerCase()};
+      query = {uuid: req.params.username.toLowerCase()};
     }
     User.findOne(query).populate("group._id disguise_group").exec((err, user) => {
       if (err) return res.status(500).send({message: "Error obtaining user record."});
@@ -66,6 +66,7 @@ module.exports = {
             let user = new User();
             user.username = params.username;
             user.username_lowercase = params.username.toLowerCase();
+            user.uuid = params.uuid;
             user.skin = params.username;
             user.last_seen = "conectado";
             user.last_game = "registrandose";

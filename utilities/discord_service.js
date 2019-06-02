@@ -73,6 +73,10 @@ module.exports = {
         await message.channel.send("Jaja c mamo xdXdxDXD");
       }
 
+      if (message.content === "¿Que opinas del seopet?") {
+        await message.channel.send("Que es un pulmon nefasto");
+      }
+
       if (message.channel.type === "dm") {
         if (message.content === '/sync') {
           await User.findOne({"discord.id": message.author.id}).exec().then(async (user) => {
