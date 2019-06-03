@@ -4,7 +4,7 @@ let mongoose = require("mongoose");
 let Schema = mongoose.Schema;
 
 let PunishmentSchema = Schema({
-  type: { type: String, enum: ['warn', 'kick', 'temp-ban', 'ban', 'forum-ban'] },
+  type: { type: String, enum: ['warn', 'kick', 'ban', 'forum-ban'] },
   punisher: {
     type: Schema.ObjectId,
     ref: 'User'
@@ -19,6 +19,7 @@ let PunishmentSchema = Schema({
     ref: 'Match'
   },
   last_ip: String,
+  silent: Boolean,
   created_at: String,
   reason: String,
   evidence: String,

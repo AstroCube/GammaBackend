@@ -10,6 +10,9 @@ const Report = require("@report");
 
 module.exports = {
 
+  // TODO: Implement silent function
+  /// TODO: Implement no-double punishment check
+
   punishment_create: function(req, res) {
     let params = req.body;
     if (params.type && params.punished && params.reason && params.evidence) {
@@ -19,6 +22,7 @@ module.exports = {
       punishment.punished = params.punished;
       punishment.reason = params.reason;
       punishment.server = "Website Punishment";
+      if (params.server)
       punishment.created_at = moment().unix();
       punishment.evidence = params.evidence;
       punishment.expires = params.expires;
@@ -69,6 +73,14 @@ module.exports = {
     });
   },
 
+  punishment_get_model: function(req, res) {
+    Punishment.findOne({_id: req.params.id}, (err, punishment) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la sanción."});
+      if (!punishment) return res.status(404).send({message: "No se ha econtrado la sanción."});
+      return res.status(200).send(punishment);
+    });
+  },
+
   punishment_list: function(req, res) {
     try {
       let itemsPerPage = 18;
@@ -109,127 +121,4 @@ module.exports = {
     });
   },
 
-  // -- Minecraft Functions -- //
-
-  ingame_create: function(req, res) {
-    try {
-      let params = req.body;
-      if (!params.username || !params.target || !params.type || !params.reason || !params.server || !params.last_ip || !params.realm) {
-        return res.status(200).send({query_success: "false", message: "commons_admin_punishments_error"});
-      } else {
-        AF.real_player(params.target, req.user.sub, params.realm).then((target_data) => {
-          if (!target_data.found) return res.status(200).send({query_success: "false", message: "commons_admin_punishments_not_found"});
-          let punishment = new Punishment();
-          punishment.type = params.type;
-          punishment.punisher = req.user.sub;
-          punishment.punished = target_data._id;
-          punishment.reason = params.reason;
-          punishment.last_ip = params.last_ip;
-          punishment.server = params.server;
-          punishment.created_at = moment().unix();
-          punishment.evidence = null;
-          if (params.expires) punishment.expires = params.expires;
-          punishment.automatic = false;
-          punishment.appealed = false;
-          punishment.active = true;
-          punishment.save((err, punishment) => {
-            if (err || !punishment) return res.status(200).send({query_success: "false", message: "commons_admin_punishments_error"});
-            return res.status(200).send({
-              query_success: "true",
-              query_user: target_data.sender,
-              query_target: target_data,
-              punishment_info: punishment
-            });
-          });
-        }).catch((err) => {
-          console.log(err);
-          return res.status(200).send({query_success: "false", message: "commons_admin_punishments_error"});
-        });
-      }
-    } catch(err) {
-      return res.status(200).send({query_success: "false", message: "commons_admin_punishments_error"});
-    }
-  },
-
-  ingame_list: function(req, res) {
-    try {
-      let page;
-      let params = req.body;
-      if (!req.params.page) {
-        page = 1;
-      } else {
-        page = req.params.page;
-      }
-      if (!params.username || !params.ipp || !params.target || !params.realm) {
-        return res.status(200).send({query_success: "false", message: "commons_admin_punishments_error"});
-      } else {
-        AF.real_player(params.target, params.realm).then((target_data) => {
-          Punishment.find(async (err, punishments_id) => {
-            let punishments;
-            if (!params.type) {
-              punishments = await Promise.map((punishments_id), async (punishments) => {
-                return await Punishment.findOne({"_id": punishments._id}).exec().then(async (punishment) => {
-                  return punishment;
-                }).catch((err) => {
-                  console.log(err);
-                });
-              });
-            } else {
-              punishments = await Promise.map((punishments_id), async (punishments) => {
-                return await Punishment.findOne({"_id": punishments._id, type: params.type.toLowerCase()}).exec().then(async (punishment) => {
-                  return punishment;
-                }).catch((err) => {
-                  console.log(err);
-                });
-              });
-            }
-            punishments.sort((a, b) => parseFloat(a.created_at) - parseFloat(b.created_at));
-            let paginatedPunishments = await pagination.paginate(punishments, params.ipp, page).then((paginated) => {
-              return paginated;
-            }).catch((err) => {
-              console.log(err);
-            });
-            let found_register;
-            if (punishments.length <= 0) {
-              found_register = "false";
-            } else {
-              found_register = "true";
-            }
-            return res.status(200).send({
-              query_success: "true",
-              found_register: found_register,
-              query_user: target_data.sender,
-              query_target: target_data,
-              punishments: paginatedPunishments,
-              page,
-              pages: Math.ceil(punishments.length/params.ipp)
-            });
-          });
-        }).catch((err) => {
-          console.log(err);
-          return res.status(200).send({query_success: "false", message: "commons_admin_punishments_error"});
-        });
-      }
-    } catch(err) {
-      console.log(err);
-      return res.status(200).send({query_success: "false", message: "commons_admin_punishments_error"});
-    }
-  }
-
 };
-
-/*async function profilePunishments(id) {
-  try {
-    getUserPunishmentsIds(id).then(async (punishments_id) => {
-      let punishments = await Promise.map((punishments_id), async (punishments) => {
-        return await AF.punishment_placeholder(punishments._id).then((punishment_placeholder) => { return punishment_placeholder; }).catch((err) => { console.log(err) });
-      });
-      punishments.sort((a, b) => parseFloat(a.punishment_details.created_at) - parseFloat(b.punishment_details.created_at));
-      return punishments;
-    }).catch((err) => {
-      console.log(err);
-    });
-  } catch(err) {
-    console.log(err);
-  }
-}*/
