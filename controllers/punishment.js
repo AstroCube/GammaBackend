@@ -102,10 +102,16 @@ module.exports = {
   },
 
   punishment_list_user: function(req, res) {
-    Punishment.find({_id: req.query.id, active: req.query.active}, (err, punishments) => {
-      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
-      return res.status(200).send(punishments);
-    });
+    if (req.query.id && req.query.active) {
+      let query = {_id: req.query.id, active: req.query.active};
+      if (req.query.type) query.type = req.query.type;
+      Punishment.find(query, (err, punishments) => {
+        if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
+        return res.status(200).send(punishments);
+      });
+    } else {
+      return res.status(400).send({message: "No se ha enviado correctamente la solicitúd."});
+    }
   },
 
   punishment_update: function(req, res) {
@@ -122,5 +128,18 @@ module.exports = {
       return res.status(200).send({punishment});
     });
   },
+
+  punishment_last: function(req, res) {
+    if (req.query.id) {
+      let query = {_id: req.query.id};
+      if (!req.query.type) query.type = req.query.type;
+      Punishment.find(query).sort("created_at").exec((err, punishments) => {
+        if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
+        return res.status(200).send(punishments[0]);
+      });
+    } else {
+      return res.status(400).send({message: "No se ha enviado correctamente la solicitúd."});
+    }
+  }
 
 };

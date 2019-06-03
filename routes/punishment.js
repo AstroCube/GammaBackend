@@ -14,4 +14,6 @@ api.get("/punishment/list/:page?", md_auth.ensureAuth, punishment_controller.pun
 // --- Minecraft Routes --- //
 api.get("/punishment/get-model/:id", cluster_auth.ensureAuth, punishment_controller.punishment_get_model);
 api.get("/punishment/list-model", cluster_auth.ensureAuth, punishment_controller.punishment_list_user);
+api.get("/punishment/get-last", cluster_auth.ensureAuth, punishment_controller.punishment_last);
+
 module.exports = api;
