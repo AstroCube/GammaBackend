@@ -82,28 +82,30 @@ module.exports = {
   },
 
   punishment_list: function(req, res) {
-    try {
-      let itemsPerPage = 18;
-      Punishment.find(async (err, punishments_id) => {
-        if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
-        let punishments = await Promise.map((punishments_id), async (punishments) => {
-          return await AF.punishment_placeholder(punishments._id);
-        });
-        punishments.sort((a, b) => parseFloat(a.punishment_details.created_at) - parseFloat(b.punishment_details.created_at));
-        let paginatedPunishments = await pagination.paginate(punishments, itemsPerPage, req.params.page).then((paginated) => {
-          return paginated;
-        }).catch((err) => {
-          console.log(err);
-        });
-        return res.status(200).send({
-          paginatedPunishments,
-          page: req.params.page,
-          pages: Math.ceil(punishments.length/itemsPerPage)
-        });
+    Punishment.find(async (err, punishments_id) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
+      let punishments = await Promise.map((punishments_id), async (punishments) => {
+        return await AF.punishment_placeholder(punishments._id);
       });
-    } catch (err) {
-      console.log(err);
-    }
+      punishments.sort((a, b) => parseFloat(a.punishment_details.created_at) - parseFloat(b.punishment_details.created_at));
+      let paginatedPunishments = await pagination.paginate(punishments, 18, req.params.page).then((paginated) => {
+        return paginated;
+      }).catch((err) => {
+        console.log(err);
+      });
+      return res.status(200).send({
+        paginatedPunishments,
+        page: req.params.page,
+        pages: Math.ceil(punishments.length/itemsPerPage)
+      });
+    });
+  },
+
+  punishment_list_user: function(req, res) {
+    Punishment.find({_id: req.query.id, active: req.query.active}, (err, punishments) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
+      return res.status(200).send(punishments);
+    });
   },
 
   punishment_update: function(req, res) {
