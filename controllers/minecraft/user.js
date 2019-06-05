@@ -21,10 +21,11 @@ module.exports = {
     if (Validator.isValid(req.params.username.toString())) {
       query = {_id: req.params.username};
     } else {
-      query = {uuid: req.params.username.toLowerCase()};
+      query = {username_lowercase: req.params.username.toLowerCase()};
     }
     User.findOne(query).populate("group._id disguise_group").exec((err, user) => {
       if (err) return res.status(500).send({message: "Error obtaining user record."});
+      if (!user) return res.status(400).send({message: "No se ha encontrado al jugador."});
       return res.status(200).send(user);
     });
   },
@@ -49,9 +50,9 @@ module.exports = {
           if (err) return res.status(500).send({message: "Error when pairing user with the server."});
           if (user.password) {
             delete user.password;
-            return res.status(200).send({multi: false, registered: true, user: updated_login});
+            return res.status(200).send({multi: false, registered: true, user: updated_login._id});
           } else {
-            return res.status(200).send({multi: false, registered: false, user: updated_login});
+            return res.status(200).send({multi: false, registered: false, user: updated_login._id});
           }
         });
       } else {
@@ -85,7 +86,7 @@ module.exports = {
                   // Trick to prevent model creation callbacks
                   AF.friend_create(saved_user._id);
                   AF.stats_create(saved_user._id);
-                  return res.status(200).send({multi: false, registered: false, user: user});
+                  return res.status(200).send({multi: false, registered: false, user: user._id});
                 });
               } else {
                 return res.status(500).send({message: "Error when pairing user with the server."});

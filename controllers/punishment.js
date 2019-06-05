@@ -15,16 +15,16 @@ module.exports = {
 
   punishment_create: function(req, res) {
     let params = req.body;
-    if (params.type && params.punished && params.reason && params.evidence) {
+    if (params.type && params.punished && params.reason) {
       let punishment = new Punishment();
-      punishment.type = params.type;
+      punishment.type = params.type.toLowerCase();
       punishment.punisher = req.user.sub;
       punishment.punished = params.punished;
       punishment.reason = params.reason;
       punishment.server = "Website Punishment";
-      if (params.server)
+      if (params.server) punishment.server = params.server;
       punishment.created_at = moment().unix();
-      punishment.evidence = params.evidence;
+      if (params.evidence) punishment.evidence = params.evidence;
       punishment.expires = params.expires;
       punishment.automatic = false;
       punishment.appealed = false;
@@ -103,8 +103,8 @@ module.exports = {
 
   punishment_list_user: function(req, res) {
     if (req.query.id && req.query.active) {
-      let query = {_id: req.query.id, active: req.query.active};
-      if (req.query.type) query.type = req.query.type;
+      let query = {punished: req.query.id, active: req.query.active};
+      if (req.query.type && req.query.type !== '') query = {punished: req.query.id, active: req.query.active, type: req.query.type.toLowerCase()};
       Punishment.find(query, (err, punishments) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
         return res.status(200).send(punishments);
@@ -122,8 +122,7 @@ module.exports = {
     delete update.server;
     delete update.type;
     delete update._id;
-    let id = req.params.id;
-    Punishment.findOneAndUpdate({"_id": id}, update, {new: true}, (err, punishment) => {
+    Punishment.findOneAndUpdate({"_id": req.params.id}, update, {new: true}, (err, punishment) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al actualizar la sanción."});
       return res.status(200).send({punishment});
     });
@@ -131,10 +130,10 @@ module.exports = {
 
   punishment_last: function(req, res) {
     if (req.query.id) {
-      let query = {_id: req.query.id};
-      if (!req.query.type) query.type = req.query.type;
+      let query = {punished: req.query.id};
+      if (req.query.type && req.query.type !== '') query = {punished: req.query.id, type: req.query.type.toLowerCase()};
       Punishment.find(query).sort("created_at").exec((err, punishments) => {
-        if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de sanciones."});
+        if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la última sanción."});
         return res.status(200).send(punishments[0]);
       });
     } else {
