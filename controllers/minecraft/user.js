@@ -25,7 +25,7 @@ module.exports = {
     }
     User.findOne(query).populate("group._id disguise_group").exec((err, user) => {
       if (err) return res.status(500).send({message: "Error obtaining user record."});
-      if (!user) return res.status(400).send({message: "No se ha encontrado al jugador."});
+      if (!user) return res.status(404).send({message: "No se ha encontrado al jugador."});
       return res.status(200).send(user);
     });
   },
