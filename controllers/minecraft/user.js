@@ -67,7 +67,6 @@ module.exports = {
             let user = new User();
             user.username = params.username;
             user.username_lowercase = params.username.toLowerCase();
-            user.uuid = params.uuid;
             user.skin = params.username;
             user.last_seen = "conectado";
             user.last_game = "registrandose";
