@@ -71,7 +71,8 @@ let UserSchema = Schema({
   accept_gifts: { type: Boolean, default: false },
   accept_friends : { type: Boolean, default: false },
   accept_parties: { type: Boolean, default: false },
-  show_status: { type: Boolean, default: false }
+  show_status: { type: Boolean, default: false },
+  receive_requests: { type: Boolean, default: true }
 });
 
 module.exports = mongoose.model('User', UserSchema);
