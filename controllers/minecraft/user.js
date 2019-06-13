@@ -46,7 +46,7 @@ module.exports = {
       if (err) return res.status(500).send({message: "Error when pairing user with the server."});
       if (user) {
         // Find if user already registered
-        User.findByIdAndUpdate({_id: user._id}, {last_seen: "conectado"}).populate("group._id disguise_group").exec((err, updated_login)  => {
+        User.findByIdAndUpdate({_id: user._id}, {last_seen: 0}).populate("group._id disguise_group").exec((err, updated_login)  => {
           if (err) return res.status(500).send({message: "Error when pairing user with the server."});
           if (user.password) {
             delete user.password;
@@ -68,7 +68,7 @@ module.exports = {
             user.username = params.username;
             user.username_lowercase = params.username.toLowerCase();
             user.skin = params.username;
-            user.last_seen = "conectado";
+            user.last_seen = 0;
             user.last_game = "registrandose";
             user.member_since = Date;
             user.logged = "authenticating";
