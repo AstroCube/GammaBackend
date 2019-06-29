@@ -72,7 +72,8 @@ let UserSchema = Schema({
   accept_friends : { type: Boolean, default: false },
   accept_parties: { type: Boolean, default: false },
   show_status: { type: Boolean, default: false },
-  receive_requests: { type: Boolean, default: true }
+  receive_requests: { type: Boolean, default: true },
+  hiding_players: { type: Boolean, default: false}
 });
 
 module.exports = mongoose.model('User', UserSchema);
