@@ -26,6 +26,7 @@ let topic_routes = require("./routes/forum/topic");
 // -- Minecraft routes -- //
 
 let server_routes = require("./routes/minecraft/server");
+let gamemode_routes = require("./routes/minecraft/gamemode");
 let stats_routes = require("./routes/minecraft/stats");
 let map_routes = require("./routes/minecraft/map");
 let match_routes = require("./routes/minecraft/match");
@@ -65,6 +66,7 @@ app.use('/api', topic_routes);
 
 app.use('/api', appeal_routes);
 app.use('/api', server_routes);
+app.use('/api', gamemode_routes);
 app.use('/api', stats_routes);
 app.use('/api', map_routes);
 app.use('/api', match_routes);

@@ -51,6 +51,7 @@
     "@appeal_controller": "controllers/appeal",
     "@friend_controller": "controllers/friend",
     "@group_controller": "controllers/group",
+    "@gamemode_controller": "controllers/minecraft/gamemode",
     "@punishment_controller": "controllers/punishment",
     "@report_controller": "controllers/report",
     "@user_controller": "controllers/user",
