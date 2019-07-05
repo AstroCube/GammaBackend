@@ -22,9 +22,11 @@ module.exports = {
         server.cluster = params.cluster;
         server.max_running = params.max_running;
         server.max_total = params.max_total;
+        server.players = [];
+        server.matches = [];
         server.save((err, server) => {
           if (err || !server) return res.status(500).send({message: "Ha ocurrido un error al iniciar el servidor."});
-          return res.status(200).send({server: AF.fixId(server), token: cluster_token.createToken(server), requested: req.params.request});
+          return res.status(200).send({server: AF.fixId(server), token: cluster_token.createToken(server)});
         });
       });
     } else {
