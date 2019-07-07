@@ -1,19 +1,22 @@
 "use strict";
 
 const express = require("express");
-const md_auth = require("@default_auth");
-const cluster_auth = require("@cluster_auth");
-const server_controller = require("@server_controller");
-const cluster_controller = require("@cluster_controller");
+const mdAuth = require("@default_auth");
+const clusterAuth = require("@cluster_auth");
+const serverController = require("@server_controller");
+const clusterController = require("@cluster_controller");
 
 let api = express.Router();
 
-api.post("/clusters/create", md_auth.ensureAuth, cluster_controller.create_cluster);
-api.get("/clusters/get/:id", md_auth.ensureAuth, cluster_controller.get_cluster);
-api.put("/clusters/update/:id", md_auth.ensureAuth, cluster_controller.update_cluster);
-api.delete("/clusters/delete/:id", md_auth.ensureAuth, cluster_controller.delete_cluster);
+api.post("/clusters/create", mdAuth.ensureAuth, clusterController.create_cluster);
+api.get("/clusters/get/:id", mdAuth.ensureAuth, clusterController.get_cluster);
+api.put("/clusters/update/:id", mdAuth.ensureAuth, clusterController.update_cluster);
+api.delete("/clusters/delete/:id", mdAuth.ensureAuth, clusterController.delete_cluster);
 
-api.post("/server/connect", server_controller.load_server);
-api.delete("/server/disconnect", cluster_auth.ensureAuth, server_controller.disconnect_server);
+api.post("/server/connect", serverController.loadServer);
+api.post("/server/get-query", clusterAuth.ensureAuth, serverController.getServerByQuery);
+api.put("/server/update/:id", clusterAuth.ensureAuth, serverController.updateServer);
+api.get("/server/get/:id", clusterAuth.ensureAuth, serverController.getServer);
+api.delete("/server/disconnect", clusterAuth.ensureAuth, serverController.disconnectServer);
 
 module.exports = api;
