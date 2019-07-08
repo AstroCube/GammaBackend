@@ -8,7 +8,7 @@ const clusterController = require("@cluster_controller");
 
 let api = express.Router();
 
-api.post("/clusters/create", mdAuth.ensureAuth, clusterController.create_cluster);
+api.post("/clusters/create/:cluster", mdAuth.ensureAuth, clusterController.create_cluster);
 api.get("/clusters/get/:id", mdAuth.ensureAuth, clusterController.get_cluster);
 api.put("/clusters/update/:id", mdAuth.ensureAuth, clusterController.update_cluster);
 api.delete("/clusters/delete/:id", mdAuth.ensureAuth, clusterController.delete_cluster);
