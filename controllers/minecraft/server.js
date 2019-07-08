@@ -10,8 +10,8 @@ module.exports = {
 
   loadServer: function(req, res) {
     let params = req.body;
-    if (params.slug && params.type) {
-      Cluster.findOne({_id: req.params.cluster}, (err, cluster) => {
+    if (params.slug && params.type && params.cluster) {
+      Cluster.findOne({_id: params.cluster}, (err, cluster) => {
         if (!cluster) return res.status(403).send({message: "El cluster al que se intenta iniciar no es válido."});
         let server = new Server();
         server.slug = params.slug;
@@ -19,7 +19,7 @@ module.exports = {
         server.started_at = moment().unix();
         server.gamemode = params.gamemode;
         server.sub_gamemode = params.sub_gamemode;
-        server.cluster = req.params.cluster;
+        server.cluster = params.cluster;
         server.max_running = params.max_running;
         server.max_total = params.max_total;
         server.players = [];
