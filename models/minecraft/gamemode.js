@@ -9,7 +9,6 @@ let GamemodeSchema = Schema({
   lobby: String,
   navigator: String,
   slot: Number,
-  description: String,
   sub_types: [{
     _id: false,
     name: String,

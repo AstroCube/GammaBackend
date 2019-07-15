@@ -5,9 +5,9 @@ let Schema = mongoose.Schema;
 
 let MapSchema = Schema({
   name: String,
-  name_lowercase: String,
+  nameLowercase: String,
   file: String,
-  xml: String,
+  configuration: String,
   image: String,
   author: {
     type: Schema.ObjectId,
@@ -26,26 +26,19 @@ let MapSchema = Schema({
     type: Schema.ObjectId,
     ref: 'Gamemode'
   },
-  sub_type: String,
+  subGamemode: String,
   description: String,
-  rating: {
-    one_star: [
-      String
-    ],
-    two_stars: [
-      String
-    ],
-    three_stars: [
-      String
-    ],
-    four_stars: [
-      String
-    ],
-    five_stars: [
-      String
-    ]
-  },
-  add_date: String
+  rating: [
+    {
+      _id: false,
+      star: { type: String, enum: ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE'] },
+      user: {
+        type: Schema.ObjectId,
+        ref: 'User'
+      }
+    }
+  ],
+  registeredDate: String
 });
 
 module.exports = mongoose.model('Map', MapSchema);

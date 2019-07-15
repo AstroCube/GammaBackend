@@ -11,14 +11,67 @@ const User = require("@user");
 
 module.exports = {
 
-  map_load: function(req, res) {
+  mapLoad: function(req, res) {
+    const params = req.body;
+
+    Map.findOne({nameLowercase: params.name.toLowerCase()}, (err, mapRecord) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
+      if (!mapRecord) {
+        let map = new Map();
+        map.name = params.name;
+        map.nameLowercase = map.name.toLowerCase();
+        map.author = params.author;
+        map.version = params.version;
+        map.contributors = params.contributors;
+        map.gamemode = params.gamemode;
+        map.subGamemode = params.subGamemode;
+        map.description = params.description;
+        map.rating = params.rating;
+
+        // --- Image creation --- //
+        const serialization = Math.floor(Math.random() * 255);
+        const fileName = "./uploads/map/file/" + serialization + ".zip";
+        fs.writeFile(fileName, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
+          if (err) return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
+          const configurationName = "./uploads/map/configuration/" + serialization + ".json";
+          fs.writeFile(configurationName, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
+            if (err) {
+              AF.file_unlink(fileName);
+              return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
+            }
+            const imageName = "./uploads/map/image/" + serialization + ".json";
+            fs.writeFile(imageName, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
+              if (err) {
+                AF.file_unlink(fileName);
+                AF.file_unlink(configurationName);
+                return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
+              }
+
+              map.file = serialization + ".zip";
+              map.configuration = serialization + ".json";
+              map.image = serialization + ".png";
+
+              map.save((err, savedMap) => {
+                if (err) return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
+                return res.status(200).send(savedMap);
+              });
+            });
+          });
+        });
+      } else {
+
+      }
+    });
+  },
+
+  /*map_load: function(req, res) {
     let params = req.body;
     let error = false;
     let file = null;
     let image = null;
-    let xml = null;
+    let configuration = null;
 
-    if (params.name && params.file && params.file_extension && params.xml && params.xml_extension && params.author && params.version && params.gamemode) {
+    if (params.name && params.file && params.file_extension && params.configuration && params.xml_extension && params.author && params.version && params.gamemode) {
       Map.findOne({name_lowercase: params.name.toLowerCase()}, async (err, found_map) => {
         if (err) return res.status(200).send({query_success: false, message: "Ha ocurrido un error al buscar el mapa en la base de datos."});
         if (!found_map) {
@@ -66,13 +119,13 @@ module.exports = {
 
           let xml_extension = params.xml_extension;
           let xml_name = map.name_lowercase.replace(/ /g, "_");
-          let xml_path = "./uploads/map/xml/" + xml_name + "." + xml_extension;
-          if (xml_extension === "xml") {
-            fs.writeFile(xml_path, params.xml.split(";base64,").pop(), {encoding: "base64"}, (err) => {
+          let xml_path = "./uploads/map/configuration/" + xml_name + "." + xml_extension;
+          if (xml_extension === "configuration") {
+            fs.writeFile(xml_path, params.configuration.split(";base64,").pop(), {encoding: "base64"}, (err) => {
               if (err) error = true;
             });
-            map.xml = xml_name + "." + xml_extension;
-            xml = xml_path;
+            map.configuration = xml_name + "." + xml_extension;
+            configuration = xml_path;
           } else {
             if (file) AF.file_unlink(file);
             return res.status(200).send({query_success: false, message: "La extensión del XML no es válida."});
@@ -83,7 +136,7 @@ module.exports = {
           if (params.image && params.image_extension) {
             let image_extension = params.image_extension;
             let image_name = map.name_lowercase.replace(/ /g, "_");
-            let image_path = "./uploads/map/images/" + image_name + "." + image_extension;
+            let image_path = "./uploads/map/image/" + image_name + "." + image_extension;
             if (image_extension === "jpeg" || image_extension === "jpg" || image_extension === "png") {
               fs.writeFile(image_path, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
                 if (err) error = true;
@@ -92,16 +145,16 @@ module.exports = {
               image = image_path;
             } else {
               if (file) AF.file_unlink(file);
-              if (xml) AF.file_unlink(xml);
+              if (configuration) AF.file_unlink(configuration);
               return res.status(200).send({query_success: false, message: "La extensión de la imágen no es válida."});
             }
           }
 
-          if (map.author && map.gamemode && file && xml && !error) {
+          if (map.author && map.gamemode && file && configuration && !error) {
             map.save((err, saved_map) => {
               if (err || !saved_map) {
                 if (file) AF.file_unlink(file);
-                if (xml) AF.file_unlink(xml);
+                if (configuration) AF.file_unlink(configuration);
                 if (image) AF.file_unlink(image);
                 return res.status(200).send({query_success: false, message: "Ha ocurrido un error al crear el mapa."});
               } else {
@@ -110,7 +163,7 @@ module.exports = {
             });
           } else {
             if (file) AF.file_unlink(file);
-            if (xml) AF.file_unlink(xml);
+            if (configuration) AF.file_unlink(configuration);
             if (image) AF.file_unlink(image);
             return res.status(200).send({query_success: false, message: "Ha ocurrido un error al actualizar el archivo."});
           }
@@ -151,17 +204,17 @@ module.exports = {
 
             // --- XML file processing --- //
 
-            if (params.xml) {
-              AF.file_unlink("./uploads/map/xml/" + found_map.file);
+            if (params.configuration) {
+              AF.file_unlink("./uploads/map/configuration/" + found_map.file);
               let xml_extension = params.xml_extension;
               let xml_name = found_map.name_lowercase.replace(/ /g, "_");
-              let xml_path = "./uploads/map/xml/" + xml_name + "." + xml_extension;
-              if (xml_extension === "xml") {
-                fs.writeFile(xml_path, params.xml.split(";base64,").pop(), {encoding: "base64"}, (err) => {
+              let xml_path = "./uploads/map/configuration/" + xml_name + "." + xml_extension;
+              if (xml_extension === "configuration") {
+                fs.writeFile(xml_path, params.configuration.split(";base64,").pop(), {encoding: "base64"}, (err) => {
                   if (err) return res.status(200).send({query_success: false, message: "Ha ocurrido un error al actualizar el XML del mapa."});
                 });
-                found_map.xml = xml_name + "." + xml_extension;
-                xml = xml_path;
+                found_map.configuration = xml_name + "." + xml_extension;
+                configuration = xml_path;
               } else {
                 if (file) AF.file_unlink(file);
                 return res.status(200).send({query_success: false, message: "La extensión del XML no es válida."});
@@ -174,16 +227,16 @@ module.exports = {
               if (found_map.image) AF.file_unlink("./uploads/map/image/" + found_map.image);
               let image_extension = params.image_extension;
               let image_name = found_map.name_lowercase.replace(/ /g, "_");
-              let image_path = "./uploads/map/images/" + image_name + "." + image_extension;
+              let image_path = "./uploads/map/image/" + image_name + "." + image_extension;
               if (image_extension === "jpeg" || image_extension === "jpg" || image_extension === "png") {
                 fs.writeFile(image_path, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
                   if (err) return res.status(200).send({query_success: false, message: "Ha ocurrido un error al actualizar el XML del mapa."});
                 });
                 found_map.image = image_name + "." + image_extension;
-                xml = image_path;
+                configuration = image_path;
               } else {
                 if (file) AF.file_unlink(file);
-                if (xml) AF.file_unlink(xml);
+                if (configuration) AF.file_unlink(configuration);
                 return res.status(200).send({query_success: false, message: "La extensión de la imágen no es válida."});
               }
             }
@@ -191,7 +244,7 @@ module.exports = {
             found_map.save(async (err, updated_map) => {
               if (err || !updated_map) {
                 if (file) AF.file_unlink(file);
-                if (xml) AF.file_unlink(xml);
+                if (configuration) AF.file_unlink(configuration);
                 if (image) AF.file_unlink(image);
                 return res.status(200).send({query_success: false, message: "Ha ocurrido un error al crear el mapa."});
               }
@@ -205,7 +258,7 @@ module.exports = {
     } else {
       return res.status(200).send({query_success: false, message: "No se han puesto los campos necesarios para procesar el mapa."});
     }
-  },
+  },*/
 
   map_vote: function(req, res) {
     if (req.body.vote && req.body.username && req.body.map) {
