@@ -7,7 +7,6 @@ const MapController = require("@map_controller");
 let api = express.Router();
 
 // -- Cluster Related -- //
-api.post("/map/load", cluster_auth.ensureAuth, MapController.map_load);
-api.post("/map/vote", cluster_auth.ensureAuth, MapController.map_load);
+api.post("/map/load", cluster_auth.ensureAuth, MapController.mapLoad);
 
 module.exports = api;
