@@ -23,8 +23,7 @@ module.exports = {
     } else {
       query = {username_lowercase: req.params.username.toLowerCase()};
     }
-    User.findOne(query).populate("disguise_group").exec().then(async (err, user) => {
-      console.log(err);
+    User.findOne(query).populate("disguise_group").exec().then(async (user) => {
       if (err) return res.status(500).send({message: "Error obtaining user record."});
       if (!user) return res.status(404).send({message: "No se ha encontrado al jugador."});
       let fixedUser = user;
