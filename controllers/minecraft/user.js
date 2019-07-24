@@ -23,10 +23,21 @@ module.exports = {
     } else {
       query = {username_lowercase: req.params.username.toLowerCase()};
     }
-    User.findOne(query).populate("group._id disguise_group").exec((err, user) => {
+    User.findOne(query).populate("disguise_group").exec().then(async (err, user) => {
       if (err) return res.status(500).send({message: "Error obtaining user record."});
       if (!user) return res.status(404).send({message: "No se ha encontrado al jugador."});
-      return res.status(200).send(user);
+      let fixedUser = user;
+      fixedUser.group = await Promise.map(user.group, async (group) => {
+        return await Group.findOne({_id: group._id}).exec().then((g) => {
+          return g;
+        }).catch((err) => {
+          console.log(err);
+        });
+      });
+      return res.status(200).send(fixedUser);
+    }).catch((er) => {
+      console.log(er);
+      return res.status(500).send({message: "Error obtaining user record."});
     });
   },
 
