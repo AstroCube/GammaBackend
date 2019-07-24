@@ -13,7 +13,6 @@ let ServerSchema = Schema({
   sub_gamemode: String,
   max_running: {type: Number, default: 1},
   max_total: {type: Number, default: 1},
-  played_matches: {type: Number, default: 0},
   started_at: String,
   players: [{
     type: Schema.ObjectId,
