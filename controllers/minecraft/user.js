@@ -25,10 +25,10 @@ module.exports = {
     }
     User.findOne(query).populate("disguise_group").exec().then(async (user) => {
       if (!user) return res.status(404).send({message: "No se ha encontrado al jugador."});
-      let fixedUser = user;
+      let fixedUser = user.toObject();
       fixedUser.group = await Promise.map(user.group, async (group) => {
         return await Group.findOne({_id: group._id}).exec().then((g) => {
-          return g;
+            return g;
         }).catch((err) => {
           console.log(err);
         });
