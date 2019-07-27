@@ -7,7 +7,6 @@ let UserSchema = Schema({
   // -- Mandatory fields -- //
   username: String,
   username_lowercase: String,
-  uuid: String,
   email: String,
   password: String,
   group: [{
