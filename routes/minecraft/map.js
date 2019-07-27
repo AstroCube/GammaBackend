@@ -8,5 +8,6 @@ let api = express.Router();
 
 // -- Cluster Related -- //
 api.post("/map/load", cluster_auth.ensureAuth, MapController.mapLoad);
+api.post("/map/vote", cluster_auth.ensureAuth, MapController.mapVote);
 
 module.exports = api;

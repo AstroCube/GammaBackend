@@ -28,6 +28,7 @@ module.exports = {
           map.subGamemode = params.subGamemode;
           map.description = params.description;
           map.rating = params.rating;
+          map.registeredDate = moment().unix();
 
           // --- Image creation --- //
           const serialization = Math.floor(Math.random() * 255);
@@ -114,6 +115,34 @@ module.exports = {
       });
     } else {
       return res.status(400).send({message: "No se han enviado los parametros correctamente."});
+    }
+  },
+
+  mapVote: function(req, res) {
+    let params = req.body;
+    if (params.map && params.user && params.rating) {
+      User.findOne({_id: params.user}, (err, user) => {
+        if (err || !user) return res.status(500).send({message: "Ha ocurrido un error al obtener el usuario."});
+        Map.findOne({_id: params.map}, async (err, map) => {
+          if (err || !map) return res.status(500).send({message: "Ha ocurrido un error al obtener el mapa."});
+          let alreadyVoted = false;
+          let rating = await Promise.map(map.rating, (rating) => {
+            if (rating.user.toString() !== params.user.toString()) {
+              return rating;
+            } else {
+              alreadyVoted = true;
+            }
+          });
+          rating.push({star: params.rating, user: params.user});
+          params.rating = rating;
+          map.save((err, savedMap) => {
+            if (!savedMap || err) return res.status(500).send({message: "Ha ocurrido un error al actualizar el voto."});
+            return res.status(200).send(alreadyVoted);
+          });
+        });
+      });
+    } else {
+      return res.status(400).send({message: "No se han enviado los parámetros correctamente."});
     }
   }
 
