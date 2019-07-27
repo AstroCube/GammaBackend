@@ -31,7 +31,7 @@ let MapSchema = Schema({
   rating: [
     {
       _id: false,
-      star: { type: String, enum: ['ONE', 'TWO', 'THREE', 'FOUR', 'FIVE'] },
+      star: { type: Number, enum: [1, 2, 3, 4, 5] },
       user: {
         type: Schema.ObjectId,
         ref: 'User'
