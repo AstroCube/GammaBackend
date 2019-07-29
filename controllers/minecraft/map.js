@@ -14,7 +14,7 @@ module.exports = {
   mapLoad: function(req, res) {
     const params = req.body;
 
-    if (params.name && params.author && params.version && params.contributors && params.gamemode && params.subGamemode && params.description && params.rating) {
+    if (params.name && params.author && params.version && params.image && params.contributors && params.gamemode && params.subGamemode && params.description && params.rating) {
       Map.findOne({nameLowercase: params.name.toLowerCase()}, (err, mapRecord) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
         if (!mapRecord) {
