@@ -34,7 +34,7 @@ let party_routes = require("./routes/minecraft/party");
 let minecraft_user_routes = require("./routes/minecraft/user");
 let workspace_routes = require("./routes/minecraft/workspace");
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({limit: '100mb', extended: false }));
 app.use(bodyParser.json());
 
 app.use((req, res, next) => {
