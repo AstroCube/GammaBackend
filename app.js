@@ -34,8 +34,8 @@ let party_routes = require("./routes/minecraft/party");
 let minecraft_user_routes = require("./routes/minecraft/user");
 let workspace_routes = require("./routes/minecraft/workspace");
 
-app.use(bodyParser.urlencoded({limit: '100mb', extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({limit: '300mb', extended: false }));
+app.use(bodyParser.json({limit: '300mb'}));
 
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
