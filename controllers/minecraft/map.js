@@ -14,7 +14,7 @@ module.exports = {
   mapLoad: function(req, res) {
     const params = req.body;
 
-    if (params.name && params.author && params.version && params.image && params.contributors && params.gamemode && params.subGamemode && params.description && params.rating) {
+    if (params.name && params.author && params.version && params.image && params.file && params.configuration && params.contributors && params.gamemode && params.subGamemode && params.description && params.rating) {
       Map.findOne({nameLowercase: params.name.toLowerCase()}, (err, mapRecord) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
         if (!mapRecord) {
@@ -33,10 +33,10 @@ module.exports = {
           // --- Image creation --- //
           const serialization = Math.floor(Math.random() * 255);
           const fileName = "./uploads/map/file/" + serialization + ".zip";
-          fs.writeFile(fileName, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
+          fs.writeFile(fileName, params.file.split(";base64,").pop(), {encoding: "base64"}, (err) => {
             if (err) return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
             const configurationName = "./uploads/map/configuration/" + serialization + ".json";
-            fs.writeFile(configurationName, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
+            fs.writeFile(configurationName, params.configuration.split(";base64,").pop(), {encoding: "base64"}, (err) => {
               if (err) {
                 AF.file_unlink(fileName);
                 return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
