@@ -9,13 +9,6 @@ const Server = require("@server");
 
 module.exports = {
 
-  gamemode_list: function(req, res) {
-    Gamemode.find().select({sub_types: 0, _id: 0}).exec((err, gamemodes) => {
-      if (err || !gamemodes) return res.status(200).send({query_success: false});
-      return res.status(200).send({query_success: true, gamemodes: gamemodes});
-    });
-  },
-
   match_create: function(req, res) {
     const params = req.body;
     if (params.map && params.teams && params.gamemode && params.sub_gamemode) {
