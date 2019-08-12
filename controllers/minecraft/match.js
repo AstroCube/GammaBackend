@@ -43,51 +43,6 @@ module.exports = {
     });
   },
 
-  /*match_create: function(req, res) {
-    const params = req.body;
-    if (params.map && params.teams && params.gamemode && params.sub_gamemode) {
-      let match = new Match();
-      match.map = params.map;
-      match.teams = params.teams;
-      match.status = "waiting";
-      match.gamemode = params.gamemode;
-      match.created_at = moment().unix();
-      match.sub_gamemode = params.sub_gamemode;
-      match.save((err, saved_match) => {
-        if (err || !saved_match) return res.status(200).send({query_success: false});
-        Server.findOne({_id: req.server.sub}, (err, server) => {
-          if (err || !server) return res.status(200).send({query_success: false});
-          if (server.played_matches + 1 > server.max_total) {
-            Match.findOneAndDelete({_id: saved_match._id}, (err) => {
-              if (err) return res.status(200).send({query_success: false});
-              return res.status(200).send({query_success: false, exceeded_total: true});
-            });
-          } else if (server.max_running < server.matches.length + 1) {
-            Match.findOneAndDelete({_id: saved_match._id}, (err) => {
-              if (err) return res.status(200).send({query_success: false});
-              return res.status(200).send({query_success: false, exceeded_running: true});
-            });
-          } else {
-            Server.findOneAndUpdate({_id: server._id}, {played_matches: server.played_matches+1,$push: {matches: saved_match._id}}, {new: true}, (err, updated_server) => {
-              if (err || !updated_server) return res.status(200).send({query_success: false});
-              if (updated_server.played_matches >= updated_server.max_total) return res.status(200).send({query_success: true, restart: true, match: saved_match._id});
-              Match.find({_id: {$ne: saved_match._id}, gamemode: saved_match.gamemode, sub_gamemode: saved_match.sub_gamemode, status: "waiting"}, (err, remaining_match) => {
-                if (err) return res.status(200).send({query_success: false});
-                if (remaining_match && remaining_match.length >= 1) {
-                  return res.status(200).send({query_success: true, match: saved_match._id, can_idle: true});
-                } else {
-                  return res.status(200).send({query_success: true, match: saved_match._id});
-                }
-              });
-            });
-          }
-        });
-      });
-    } else {
-      return res.status(200).send({query_success: false});
-    }
-  },*/
-
   match_find: function(req, res) {
     let params = req.body;
     if (params.gamemode && params.sub_gamemode) {

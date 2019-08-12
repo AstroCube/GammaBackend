@@ -93,7 +93,6 @@ module.exports = {
                 User.findOne({_id: saved_user}).populate("group._id disguise_group").exec((err, user) => {
                   if (err) return res.status(500).send({message: "Error when pairing user with the server."});
                   // Trick to prevent model creation callbacks
-                  AF.friend_create(saved_user._id);
                   AF.stats_create(saved_user._id);
                   return res.status(200).send({multi: false, registered: false, user: user._id});
                 });
@@ -149,82 +148,6 @@ module.exports = {
       return res.status(400).send({message: "Request parameters are incorrect."});
     }
   },
-
-  /*bungee_join: function(req, res) {
-    User.findOne({username_lowercase: req.body.username.toLowerCase()}, (err, registered) => {
-      if (err) return res.status(200).send({can_join: false, banned: false});
-      if (!registered) return res.status(200).send({can_join: true, banned: false});
-      Punishment.findOne({$or: [{type: "ban"}, {type: "temp-ban"}], active: true, punished: registered}, (err, banned) => {
-        if (err) return res.status(200).send({can_join: false, banned: false});
-        if (banned) {
-          User.findOne({_id: banned.punisher}, (err, punisher) => {
-            AF.real_player(punisher.username, null, req.body.realm).then((punisher_data) => {
-              return res.status(200).send({
-                can_join: false,
-                banned: true,
-                language: registered.language,
-                punishment_info: {
-                  punisher_name: punisher_data.real_name,
-                  punisher_group: punisher_data.real_group,
-                  reason: banned.reason
-                }});
-            }).catch((err) => {
-              console.log(err);
-              return res.status(200).send({can_join: false, banned: false});
-            });
-          });
-        } else {
-          registered.logged = "authenticating";
-          registered.save((err, updated) => {
-            if (err || !updated) return res.status(200).send({can_join: false, banned: false});
-            if (updated) return res.status(200).send({can_join: true, banned: false});
-          });
-        }
-      });
-    });
-  },
-
-  server_record: function(req, res) {
-    User.findOne({username_lowercase: req.body.username.toLowerCase()},(err, user) => {
-      if (err) return res.status(200).send({pre_logged: false, message: "Ha ocurrido un error al realizar pre-join."});
-      if (user) {
-        User.findByIdAndUpdate(user._id, {last_seen: "conectado"}, ()  => {
-          if (!user.password) {
-            return res.status(200).send({pre_logged: true, new_user: true, multi_account: false, language: user.language});
-          } else {
-            return res.status(200).send({pre_logged: true, new_user: false, multi_account: false, language: user.language});
-          }
-        });
-      } else {
-        User.findOne({"used_ips.number" : req.body.ip, "used_ips.primary": true}, (err, multi_account) => {
-          if (err) return res.status(500).send({pre_logged: false, message: "Ha ocurrido un error al relizar pre-join."});
-          if (!multi_account) {
-            let user = new User();
-            user.username = req.body.username;
-            user.username_lowercase = req.body.username.toLowerCase();
-            user.group.push({"_id": "5b52b2048284865491b1f56a", add_date: moment().unix(), role_comment: "usuario"});
-            user.skin = req.body.username;
-            user.last_seen = "conectado";
-            user.last_game = "registrandose";
-            user.member_since = moment().unix();
-            user.logged = "authenticating";
-            user.save((err, user_stored) => {
-              if (err) return res.status(500).send({pre_logged: false, message: "Ha ocurrido un error al realizar el pre-join."});
-              if (user_stored) {
-                AF.friend_create(user_stored._id);
-                AF.stats_create(user_stored._id);
-                return res.status(200).send({pre_logged: true, new_user: true, multi_account: false, language: user_stored.language});
-              } else {
-                return res.status(200).send({pre_logged: false, message: "Ha ocurrido un error al realizar el pre-join."});
-              }
-            });
-          } else {
-            return res.status(200).send({pre_logged: true, new_user: true, multi_account: true, language: multi_account.language, account_details: { created_at: moment.unix(multi_account.member_since).format("MM/DD/YYYY"), username: multi_account.username}});
-          }
-        });
-      }
-    });
-  },*/
 
   server_left: function(req, res) {
     User.findOneAndUpdate({_id: req.user.sub}, {last_seen: moment().unix(), logged: "false"}, {new: true}, (err, user_updated)  => {
