@@ -17,7 +17,8 @@ let UserSchema = Schema({
   // -- Automatic fields -- //
   skin: { type: String, default: "Steve" },
   last_seen: String,
-  last_game: { type: String, default: "main_lobby" },
+  last_game: {type: String, default: "main_lobby"},
+  main_lobby: {type: String, default: "main_lobby"},
   member_since: Number,
   verified: { type: Boolean, default: false },
   level: { type: Number, default: 1 },
