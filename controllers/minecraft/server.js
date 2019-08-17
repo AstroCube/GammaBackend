@@ -10,7 +10,7 @@ module.exports = {
 
   loadServer: function(req, res) {
     let params = req.body;
-    if (params.slug && params.type && params.cluster) {
+    if (params.slug && params.type && params.cluster && params.maxPlayers) {
       Cluster.findOne({_id: params.cluster}, (err, cluster) => {
         if (!cluster) return res.status(403).send({message: "El cluster al que se intenta iniciar no es válido."});
         let server = new Server();
@@ -23,6 +23,7 @@ module.exports = {
         server.max_running = params.max_running;
         server.max_total = params.max_total;
         server.players = [];
+        server.maxPlayers = params.maxPlayers;
         server.matches = [];
         server.save((err, server) => {
           if (err || !server) return res.status(500).send({message: "Ha ocurrido un error al iniciar el servidor."});
