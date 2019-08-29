@@ -63,7 +63,7 @@ module.exports = {
   clearFriends: function(req, res) {
     Friend.find({$or: [{sender: req.params.id}, {receiver: req.params.id}]}, async (err, friendList) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de amigos."});
-      await Promise.forEach(friendList, (friend) => {
+      await Promise.map(friendList, (friend) => {
         Friend.findOneAndDelete({_id: friend._id}, () => {});
       });
       return res.status(200).send({deleted: true});
