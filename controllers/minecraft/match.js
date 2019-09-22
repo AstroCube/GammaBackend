@@ -43,6 +43,19 @@ module.exports = {
     });
   },
 
+  matchUpdate: function(req, res) {
+    let params = req.body;
+    delete params.map;
+    delete params.createdAt;
+    delete params.gamemode;
+    delete params.subGamemode;
+    Match.findOneAndUpdate(req.params.id, params, (err, updatedMatch) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al actualizar la partida."});
+      if (!updatedMatch) return res.status(404).send({message: "No se ha encontrado la partida a actualizar."});
+      return res.status(200).send(updatedMatch);
+    });
+  },
+
   match_find: function(req, res) {
     let params = req.body;
     if (params.gamemode && params.sub_gamemode) {
