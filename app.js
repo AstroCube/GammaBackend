@@ -1,5 +1,5 @@
 "use strict";
-
+// Si me pones publico eres gai
 
 require("./utilities/discord_service").load_bot();
 require("./utilities/socket_service").socket_listen();
