@@ -41,7 +41,7 @@ module.exports = {
                 AF.file_unlink(fileName);
                 return res.status(500).send({message: "Ha ocurrido un error al cargar el mapa."});
               }
-              const imageName = "./uploads/map/image/" + serialization + ".json";
+              const imageName = "./uploads/map/image/" + serialization + ".png";
               fs.writeFile(imageName, params.image.split(";base64,").pop(), {encoding: "base64"}, (err) => {
                 if (err) {
                   AF.file_unlink(fileName);
