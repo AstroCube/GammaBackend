@@ -56,6 +56,30 @@ module.exports = {
     });
   },
 
+  matchRemoveAll: function(req, res) {
+    Server.findOne({_id: req.server.sub}, (err, server) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al remover los mapas."});
+      if (!server) return res.status(404).send({message: "No se encuentra el servidor especificado."});
+
+      if (server.type !== "game" || server.matches.length <= 0) return res.status(400).send({message: "El servidor no tiene partidas para cerrar."});
+
+      server.matches.map((match) => {
+        Map.findOne({_id: match}, (err, matchRecord) => {
+          if (!err && matchRecord) {
+            if (matchRecord.status === "waiting") {
+              Map.findOneAndDelete({_id: matchRecord._id});
+            } else if (matchRecord.status === "ingame" || matchRecord.status === "starting") {
+              Map.findOneAndUpdate({_id: matchRecord._id}, {status: "invalidated"});
+            }
+          }
+        });
+      });
+
+      return res.status(200);
+
+    });
+  },
+
   match_find: function(req, res) {
     let params = req.body;
     if (params.gamemode && params.sub_gamemode) {
