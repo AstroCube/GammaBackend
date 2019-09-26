@@ -64,12 +64,12 @@ module.exports = {
       if (server.type !== "game" || server.matches.length <= 0) return res.status(400).send({message: "El servidor no tiene partidas para cerrar."});
 
       server.matches.map((match) => {
-        Map.findOne({_id: match}, (err, matchRecord) => {
+        Match.findOne({_id: match}, (err, matchRecord) => {
           if (!err && matchRecord) {
             if (matchRecord.status === "waiting") {
-              Map.findOneAndDelete({_id: matchRecord._id});
+              Match.findOneAndDelete({_id: matchRecord._id}, (err) => { if (err) console.log(err);});
             } else if (matchRecord.status === "ingame" || matchRecord.status === "starting") {
-              Map.findOneAndUpdate({_id: matchRecord._id}, {status: "invalidated"});
+              Match.findOneAndUpdate({_id: matchRecord._id}, {status: "invalidated"}, (err) => { if (err) console.log(err); });
             }
           }
         });
