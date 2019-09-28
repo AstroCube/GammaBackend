@@ -45,6 +45,7 @@ module.exports = {
 
   matchUpdate: function(req, res) {
     let params = req.body;
+    delete params._id;
     delete params.map;
     delete params.createdAt;
     delete params.gamemode;
