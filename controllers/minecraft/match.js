@@ -50,10 +50,10 @@ module.exports = {
     delete params.createdAt;
     delete params.gamemode;
     delete params.subGamemode;
-    Match.findOneAndUpdate(req.params.id, params, (err, updatedMatch) => {
+    Match.findOneAndUpdate(req.params.id, params, {new: true}, (err, updatedMatch) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al actualizar la partida."});
       if (!updatedMatch) return res.status(404).send({message: "No se ha encontrado la partida a actualizar."});
-      return res.status(200).send(updatedMatch);
+     return res.status(200).send(updatedMatch);
     });
   },
 
