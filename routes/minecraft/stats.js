@@ -6,7 +6,7 @@ const StatsController = require("@stats_controller");
 
 let api = express.Router();
 
-api.post("/stats/get", ClusterAuth.ensureAuth, StatsController.getStats);
-api.put("/stats/put", ClusterAuth.ensureAuth, StatsController.updateStats);
+api.get("/stats/get/:id", ClusterAuth.ensureAuth, StatsController.getStats);
+api.put("/stats/put/:id", ClusterAuth.ensureAuth, StatsController.updateStats);
 
 module.exports = api;
