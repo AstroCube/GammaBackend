@@ -45,14 +45,39 @@ module.exports = {
 
   matchUpdate: function(req, res) {
     let params = req.body;
+    delete params._id;
     delete params.map;
     delete params.createdAt;
     delete params.gamemode;
     delete params.subGamemode;
-    Match.findOneAndUpdate(req.params.id, params, (err, updatedMatch) => {
+    Match.findOneAndUpdate(req.params.id, params, {new: true}, (err, updatedMatch) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al actualizar la partida."});
       if (!updatedMatch) return res.status(404).send({message: "No se ha encontrado la partida a actualizar."});
-      return res.status(200).send(updatedMatch);
+     return res.status(200).send(updatedMatch);
+    });
+  },
+
+  matchCleanup: function(req, res) {
+    Server.findOne({_id: req.server.sub}, (err, server) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al remover los mapas."});
+      if (!server) return res.status(404).send({message: "No se encuentra el servidor especificado."});
+
+      if (server.type !== "game" || server.matches.length <= 0) return res.status(400).send({message: "El servidor no tiene partidas para cerrar."});
+
+      server.matches.map((match) => {
+        Match.findOne({_id: match}, (err, matchRecord) => {
+          if (!err && matchRecord) {
+            if (matchRecord.status === "waiting") {
+              Match.findOneAndDelete({_id: matchRecord._id}, (err) => { if (err) console.log(err);});
+            } else if (matchRecord.status === "ingame" || matchRecord.status === "starting") {
+              Match.findOneAndUpdate({_id: matchRecord._id}, {status: "invalidated"}, (err) => { if (err) console.log(err); });
+            }
+          }
+        });
+      });
+
+      return res.status(200);
+
     });
   },
 

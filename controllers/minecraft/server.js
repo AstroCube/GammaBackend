@@ -51,7 +51,7 @@ module.exports = {
   },
 
   updateServer: function(req, res) {
-    Server.findOneAndUpdate({_id: req.params.id}, req.body, (err,  server) => {
+    Server.findOneAndUpdate({_id: req.params.id}, req.body, {new: true}, (err,  server) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el servidor."});
       if (!server) return res.status(404).send({message: "No se ha encontrado el servidor que se busca."});
       return res.status(200).send(server);
