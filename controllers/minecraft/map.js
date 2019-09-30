@@ -163,6 +163,39 @@ module.exports = {
     } else {
       return res.status(400).send({message: "No se han enviado los parámetros correctamente."});
     }
+  },
+
+  mapImage: function(req, res) {
+    const filePath = "./uploads/map/image/" + req.params.file;
+    fs.exists(filePath, (file) => {
+      if (file) {
+        res.sendFile(path.resolve(filePath));
+      } else {
+        return res.status(200).send({message: "No se encontró una imágen."});
+      }
+    });
+  },
+
+  mapFile: function(req, res) {
+    const filePath = "./uploads/map/file/" + req.params.file;
+    fs.exists(filePath, (file) => {
+      if (file) {
+        res.sendFile(path.resolve(filePath));
+      } else {
+        return res.status(200).send({message: "No se encontró el archivo."});
+      }
+    });
+  },
+
+  mapConfiguration: function(req, res) {
+    const filePath = "./uploads/map/configuration/" + req.params.file;
+    fs.exists(filePath, (file) => {
+      if (file) {
+        res.sendFile(path.resolve(filePath));
+      } else {
+        return res.status(200).send({message: "No se encontró la configuración."});
+      }
+    });
   }
 
 };

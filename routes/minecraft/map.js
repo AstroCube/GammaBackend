@@ -12,5 +12,8 @@ api.post("/map/load", cluster_auth.ensureAuth, MapController.mapLoad);
 api.get("/map/get/:id", cluster_auth.ensureAuth, MapController.mapGet);
 api.get("/map/get-website/:id", mdAuth.ensureAuth, MapController.mapGetWebsite);
 api.post("/map/vote", cluster_auth.ensureAuth, MapController.mapVote);
+api.get("/map/get-image/:file", MapController.mapImage);
+api.get("/map/get-file/:file", cluster_auth.ensureAuth, MapController.mapFile);
+api.get("/map/get-config/:file", cluster_auth.ensureAuth, MapController.mapConfiguration);
 
 module.exports = api;
