@@ -3,6 +3,7 @@
 const AF = require("@auxiliar_functions");
 const bcrypt = require("bcrypt-nodejs");
 const Friend = require("@friend");
+const Group = require("@group");
 const jwt = require("@jwt_tokenization");
 const mailer = require("@smtp_service");
 const moment = require("moment");
@@ -82,8 +83,27 @@ module.exports = {
       query = req.params.id;
     }
 
-    User.findOne({_id: query}, (err, user) => {
-      return res.status(200).send(user.groups);
+    User.findOne({_id: query}, async (err, user) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el prefix del usuario."});
+      if (!user) return res.status(404).send({message: "No se ha encontrado el usuario solicitado."});
+
+      let badges = await Promise.map(user.group, async (groups) => {
+        return await Group.findOne({_id : groups._id}).exec().then((group) => {
+          return group;
+        }).catch((err) => {
+          console.log(err);
+        });
+      });
+      badges.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
+
+      return res.status(200).send({
+        id: user._id,
+        username: user.username,
+        userColor: badges[0].html_color,
+        lastSeen: user.last_seen,
+        skin: user.skin,
+        badges: badges
+      });
     });
   },
 
