@@ -126,13 +126,13 @@ module.exports = {
 
   mapGetWebsite: function(req, res) {
     Map.findOne({_id: req.params.id}).populate("author").exec((err, map) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el mapa."});
+      if (!map) return res.status(404).send({message: "No se ha encontrado el mapa."});
       let fixedMap = map.toObject();
       if (!req.user.sub) {
         delete fixedMap.file;
         delete fixedMap.configuration;
       }
-      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el mapa."});
-      if (!map) return res.status(404).send({message: "No se ha encontrado el mapa."});
       return res.status(200).send(map);
     });
   },
