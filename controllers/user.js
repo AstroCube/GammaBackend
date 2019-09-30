@@ -72,6 +72,21 @@ module.exports = {
     });
   },
 
+  getPlaceholder: function(req, res) {
+
+    let query = "";
+    if(!req.params.id) {
+      if (!req.user) return res.status(500).send({message: "You must be logged to get a prefix."});
+      query = req.user.sub;
+    } else {
+      query = req.params.id;
+    }
+
+    User.findOne({_id: query}, (err, user) => {
+      return res.status(200).send(user.groups);
+    });
+  },
+
   get_profile: function(req, res) {
     try {
       if (!req.params.user) {
