@@ -52,6 +52,9 @@ let GroupSchema = Schema({
       assign_escalated: Boolean,
       view: { type: String, enum: ['all', 'involved'] }
     },
+    maps: {
+      manage: Boolean
+    },
     forum: Schema.Types.Mixed,
     reports: {
       manage: Boolean,
