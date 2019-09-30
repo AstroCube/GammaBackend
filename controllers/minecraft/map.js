@@ -1,11 +1,9 @@
 "use strict";
 
 const AF = require("@auxiliar_functions");
-const fs = require("fs");
 const Gamemode = require("@gamemode");
 const Map = require("@map");
 const moment = require("moment");
-const path = require("path");
 const Promise = require("bluebird");
 const User = require("@user");
 
