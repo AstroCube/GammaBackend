@@ -96,7 +96,7 @@ module.exports = {
       return res.status(200).send({
         paginatedPunishments,
         page: req.params.page,
-        pages: Math.ceil(punishments.length/itemsPerPage)
+        pages: Math.ceil(punishments.length/18)
       });
     });
   },

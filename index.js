@@ -19,5 +19,3 @@ mongoose.connect(process.env.MONGO_URI)
     console.log (err);
     console.log ("[SEOCRAFT API] Ha ocurrido un error al iniciar el servidor.");
   });
-
-//TODO: Fix MAP issues - reorder Forum functions
