@@ -3,8 +3,9 @@
 const AF = require("@auxiliar_functions");
 const Gamemode = require("@gamemode");
 const Map = require("@map");
+const fs = require("fs");
+const path = require("path");
 const moment = require("moment");
-const Pagination = require("mongoose-pagination");
 const Promise = require("bluebird");
 const User = require("@user");
 
@@ -125,6 +126,19 @@ module.exports = {
     });
   },
 
+  mapGetWebsite: function(req, res) {
+    Map.findOne({_id: req.params.id}).populate("author").exec((err, map) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el mapa."});
+      if (!map) return res.status(404).send({message: "No se ha encontrado el mapa."});
+      let fixedMap = map.toObject();
+      if (!req.user.sub) {
+        delete fixedMap.file;
+        delete fixedMap.configuration;
+      }
+      return res.status(200).send(map);
+    });
+  },
+
   mapVote: function(req, res) {
     let params = req.body;
     if (params.map && params.user && params.rating) {
@@ -153,16 +167,36 @@ module.exports = {
     }
   },
 
-  mapQueryPagination: function (req, res) {
-    let query = {};
-    if (req.query.gamemode) query = {gamemode: req.query.gamemode};
-    Map.find(query).paginate(req.params.page, 27, (err, maps, total) => {
-      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los mapas."});
-      return res.status(200).send({
-        maps: maps,
-        total: total,
-        pages: Math.ceil(total/27)
-      });
+  mapImage: function(req, res) {
+    const filePath = "./uploads/map/image/" + req.params.file;
+    fs.exists(filePath, (file) => {
+      if (file) {
+        res.sendFile(path.resolve(filePath));
+      } else {
+        return res.status(200).send({message: "No se encontró una imágen."});
+      }
+    });
+  },
+
+  mapFile: function(req, res) {
+    const filePath = "./uploads/map/file/" + req.params.file;
+    fs.exists(filePath, (file) => {
+      if (file) {
+        res.sendFile(path.resolve(filePath));
+      } else {
+        return res.status(200).send({message: "No se encontró el archivo."});
+      }
+    });
+  },
+
+  mapConfiguration: function(req, res) {
+    const filePath = "./uploads/map/configuration/" + req.params.file;
+    fs.exists(filePath, (file) => {
+      if (file) {
+        res.sendFile(path.resolve(filePath));
+      } else {
+        return res.status(200).send({message: "No se encontró la configuración."});
+      }
     });
   }
 
