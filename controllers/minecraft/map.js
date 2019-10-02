@@ -208,7 +208,7 @@ module.exports = {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los mapas."});
       return res.status(200).send({
         maps: maps,
-        total: total,
+        page: req.params.page,
         pages: Math.ceil(total / 27)
       });
     });
