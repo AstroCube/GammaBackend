@@ -204,7 +204,7 @@ module.exports = {
   mapQueryPagination: function (req, res) {
     let query = {};
     if (req.query.gamemode) query = {gamemode: req.query.gamemode};
-    Map.find(query).paginate(req.params.page, 27, (err, maps, total) => {
+    Map.find(query).populate("author").paginate(req.params.page, 27, (err, maps, total) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los mapas."});
       return res.status(200).send({
         maps: maps,
