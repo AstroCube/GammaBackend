@@ -198,6 +198,19 @@ module.exports = {
         return res.status(200).send({message: "No se encontró la configuración."});
       }
     });
+  },
+
+  mapQueryPagination: function (req, res) {
+    let query = {};
+    if (req.query.gamemode) query = {gamemode: req.query.gamemode};
+    Map.find(query).paginate(req.params.page, 27, (err, maps, total) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los mapas."});
+      return res.status(200).send({
+        maps: maps,
+        total: total,
+        pages: Math.ceil(total / 27)
+      });
+    });
   }
 
 };

@@ -9,7 +9,8 @@ let api = express.Router();
 
 // -- Cluster Related -- //
 api.post("/map/load", cluster_auth.ensureAuth, MapController.mapLoad);
-api.get("/map/get/:id", cluster_auth.ensureAuth, MapController.mapGet);
+api.get("/map/get/:id", MapController.mapGet);
+api.get("/map/get-query/:page", MapController.mapQueryPagination);
 api.get("/map/get-website/:id", mdAuth.ensureAuth, MapController.mapGetWebsite);
 api.post("/map/vote", cluster_auth.ensureAuth, MapController.mapVote);
 api.get("/map/get-image/:file", MapController.mapImage);
