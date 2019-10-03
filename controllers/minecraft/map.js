@@ -201,7 +201,7 @@ module.exports = {
     });
   },
 
-  mapQueryPagination: function (req, res) {
+  mapQueryPagination: function(req, res) {
     let query = {};
     if (req.query.gamemode) query = {gamemode: req.query.gamemode};
     Map.find(query).populate("author").paginate(req.params.page, 27, (err, maps, total) => {
@@ -211,6 +211,13 @@ module.exports = {
         page: req.params.page,
         pages: Math.ceil(total / 27)
       });
+    });
+  },
+
+  mapGamemodeList: function(req, res) {
+    Gamemode.find().select("_id").exec((err, gamemodes) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los modos de juego."});
+      return res.status(200).send(gamemodes);
     });
   }
 
