@@ -1,0 +1,19 @@
+{
+	"name": "Testmap",
+	"author": "MomlessTomato",
+	"version": "1.0.0",
+	"contributors": [],
+	"gamemode": "5d5a11f35f1de46c232babae",
+	"subGamemode": "5d5a12c08f2258859e1ea7c9",
+	"description": "This is our test description",
+	"lobbyCoordinates": {
+		"x": 1261,
+		"y": 5,
+		"z": -500
+	},
+        "spectatorSpawn": {
+                "x": 1261,
+                "y": 12,
+                "z": -500
+        }
+}

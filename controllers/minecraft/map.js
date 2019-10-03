@@ -212,13 +212,5 @@ module.exports = {
         pages: Math.ceil(total / 27)
       });
     });
-  },
-
-  mapGamemodeList: function(req, res) {
-    Gamemode.find().select("_id name").exec((err, gamemodes) => {
-      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los modos de juego."});
-      return res.status(200).send(gamemodes);
-    });
   }
-
 };
