@@ -212,5 +212,12 @@ module.exports = {
         pages: Math.ceil(total / 27)
       });
     });
+  },
+
+  mapUserGet: function (req, res) {
+    Map.find({author: req.params.user}, (err, maps) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los mapas."});
+      return res.status(200).send(maps);
+    });
   }
 };
