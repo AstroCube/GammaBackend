@@ -179,6 +179,7 @@ module.exports = {
           }
 
           return res.status(200).send({
+            _id: user._id,
             username: user.username,
             skin: user.skin,
             last_game: user.last_game,
