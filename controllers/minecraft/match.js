@@ -42,7 +42,7 @@ module.exports = {
   },
 
   matchGetWebsite: function(req, res) {
-    Match.findOne({_id: req.params.id}).populate("map gamemode").exec((err, match) => {
+    Match.findOne({_id: req.params.id}).populate("map gamemode winner").exec((err, match) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la partida."});
       if (!match) return res.status(404).send({message: "No se ha encontrado la partida."});
       return res.status(200).send(match);
