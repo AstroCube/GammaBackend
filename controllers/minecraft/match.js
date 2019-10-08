@@ -1,4 +1,4 @@
-u"use strict";
+"use strict";
 
 const Match = require("@match");
 const moment = require("moment");
