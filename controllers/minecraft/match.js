@@ -1,4 +1,4 @@
-"use strict";
+u"use strict";
 
 const Match = require("@match");
 const moment = require("moment");
@@ -34,7 +34,7 @@ module.exports = {
   },
 
   matchGet: function(req, res) {
-    Match.findOne(req.params.id, (err, match) => {
+    Match.findOne({_id: req.params.id}, (err, match) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la partida."});
       if (!match) return res.status(404).send({message: "No se ha encontrado la partida."});
       return res.status(200).send(match);
