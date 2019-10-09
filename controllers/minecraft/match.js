@@ -42,7 +42,7 @@ module.exports = {
   },
 
   matchGetWebsite: function(req, res) {
-    Match.findOne({_id: req.params.id}).populate("map gamemode winner").lean().exec(async (err, match) => {
+    Match.findOne({_id: req.params.id}).populate("map gamemode winner teams.members.user").lean().exec(async (err, match) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la partida."});
       if (!match) return res.status(404).send({message: "No se ha encontrado la partida."});
       match.winner = await Promise.map(match.winner, (winners) => {
