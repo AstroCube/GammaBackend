@@ -392,5 +392,20 @@ module.exports = {
         return res.status(200).send({updated: true});
       }
     });
+  },
+
+  getMainPageTopics: function(req, res) {
+    Topic.findOne({forum: req.params.id}, (err, topic) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el foro."});
+      if (!topic) return res.status(404).send({message: "No se ha encontrado el foro a buscar."});
+      return res.status(200).send(topic);
+    });
+  },
+
+  getFirstPost: function(req, res) {
+    Post.find({topic: req.params.id}).sort("created_at").exec((err, post) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el foro."});
+      return res.status(200).send(post[0]);
+    });
   }
 };

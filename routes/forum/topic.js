@@ -18,5 +18,7 @@ api.post("/topic/reply", md_auth.ensureAuth, TopicController.topic_reply);
 api.put("/topic/update/:id", md_auth.ensureAuth, TopicController.post_update);
 api.delete("/topic/delete/:id", md_auth.ensureAuth, TopicController.topic_delete);
 api.delete("/topic/delete-post/:id", md_auth.ensureAuth, TopicController.post_delete);
+api.get("/topic/mainTopics/:id", md_auth.ensureAuth, TopicController.getMainPageTopics);
+api.get("/topic/mainPosts/:id", md_auth.ensureAuth, TopicController.getFirstPost);
 
 module.exports = api;
