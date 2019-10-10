@@ -395,9 +395,8 @@ module.exports = {
   },
 
   getMainPageTopics: function(req, res) {
-    Topic.findOne({forum: req.params.id}, (err, topic) => {
+    Topic.find({forum: req.params.id}).exec((err, topic) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el foro."});
-      if (!topic) return res.status(404).send({message: "No se ha encontrado el foro a buscar."});
       return res.status(200).send(topic);
     });
   },
