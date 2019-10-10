@@ -395,9 +395,9 @@ module.exports = {
   },
 
   getMainPageTopics: function(req, res) {
-    Topic.find({forum: req.params.id}).exec((err, topic) => {
+    Topic.find({forum: req.params.id}).sort("created_at").exec((err, topic) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el foro."});
-      return res.status(200).send(topic);
+      return res.status(200).send(topic.slice(0, 5));
     });
   },
 
