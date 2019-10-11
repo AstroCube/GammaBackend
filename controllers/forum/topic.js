@@ -402,7 +402,7 @@ module.exports = {
   },
 
   getFirstPost: function(req, res) {
-    Post.find({topic: req.params.id}).sort("created_at").exec((err, post) => {
+    Post.find({topic: req.params.id}).sort("created_at").populate("created_by").exec((err, post) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el foro."});
       return res.status(200).send(post[0]);
     });
