@@ -6,7 +6,7 @@ const User = require("@user");
 module.exports = {
 
   getStaffList: function(req, res) {
-    Group.find({staff: true}).select("_id").exec((err, groups) => {
+    Group.find({staff: true}).select("_id name color").exec((err, groups) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
       return res.status(200).send(groups);
     });
