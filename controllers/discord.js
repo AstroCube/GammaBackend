@@ -51,12 +51,12 @@ async function discordUserFetch(id) {
 
   return await User.findOne({_id: id}).exec().then(async (user) => {
 
-    if (moment().unix() > moment.unix(user.tokenTimestamp.add(7, 'days').unix())) {
+    if (moment().unix() > moment.unix(user.tokenTimestamp).add(7, 'days').unix()) {
       let formData = new URLSearchParams();
       formData.append("client_id", process.env.DISCORD_CLIENT_ID);
       formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
       formData.append("grant_type", "refresh_token");
-      formData.append("refresh_token", user.discord.refresh_token);
+      formData.append("refresh_token", user.discord.refreshToken);
       formData.append("redirect_uri", process.env.DISCORD_REDIRECT_URL);
       formData.append("scope", "identify");
 
@@ -77,8 +77,8 @@ async function discordUserFetch(id) {
             {
               method: 'GET',
               headers: {
-                Authorization: "Bearer " + updated.discord.access_token,
-              },
+                Authorization: "Bearer " + updated.discord.accessToken,
+              }
             });
         return await response.json();
       });
@@ -89,8 +89,8 @@ async function discordUserFetch(id) {
           {
             method: 'GET',
             headers: {
-              Authorization: "Bearer " + user.discord.access_token,
-            },
+              Authorization: "Bearer " + user.discord.accessToken,
+            }
           });
       return await response.json();
 
