@@ -1,6 +1,5 @@
 "use strict";
 
-const AF = require("@auxiliar_functions");
 const { URLSearchParams } = require('url');
 const discord = require("discord.js");
 const client = new discord.Client();
@@ -10,41 +9,38 @@ const Promise = require("bluebird");
 const fetch = require("node-fetch");
 const moment = require("moment");
 
-async function sync_roles(user_id) {
-  try {
-    let remove_roles = [];
-    await Group.find({discord_role: { $exists: true}}).select({"discord_role": 1, "_id": 0}).exec().then((group) => {
-      group.forEach((role) => {
-        remove_roles.push(role.discord_role);
+async function syncRoles(id) {
+  let removeRoles = [];
+  await Group.find({discord_role: { $exists: true}}).exec().then((group) => {
+    group.forEach((role) => {
+      removeRoles.push(role.discord_role);
+    });
+  });
+
+  let userGroups = await User.find({_id : id}).exec().then(async (groups) => {
+    return await Promise.map(groups[0].group, async (groups) => {
+      return await Group.findOne({_id : groups._id}).then((group) => {
+        return group.discord_role;
       });
-    }).catch((err) => { console.log(err); });
-    let user_groups = await AF.user_groups_id(user_id).then(async (groups) => {
-      return await Promise.map(groups[0].group, async (groups) => {
-        return await Group.findOne({"_id" : groups._id}).select({"discord_role": 1, "_id": 0}).then((group) => {
-          return group.discord_role;
-        }).catch((err) => { console.log(err); });
-      });
-    }).catch((err) => { console.log(err); });
-    remove_roles = await remove_roles.filter((f) => !user_groups.includes(f));
-    await AF.needed_update(user_id).then(async (user_data) => {
-      let guild = client.guilds.get(process.env.DISCORD_GUILD);
-      let user = guild.member(user_data.id);
-      await Promise.map(remove_roles, (remove) => {
-        let role = guild.roles.find("name", remove);
-        if (role !== null && user.roles.has(role)) {
-          user.removeRole(role).catch((err) => { console.log(err); });
-        }
-      });
-      await Promise.map(user_groups, (add) => {
-        let role = guild.roles.find("name", add);
-        /*if (role !== null && !user.roles.has(role)) {
-          user.addRole(role).catch((err) => { console.log(err); });
-        }*/
-      });
-    }).catch((err) => { console.log(err); });
-  } catch(err) {
-    console.log(err);
-  }
+    });
+  });
+  removeRoles = removeRoles.filter((f) => !userGroups.includes(f));
+
+  await discordUserFetch(id).then(async (userData) => {
+
+    const guild = client.guilds.get(process.env.DISCORD_GUILD);
+    const guildUser = guild.member(userData.id);
+
+    removeRoles.forEach((role) => {
+      let guildRole = guild.roles.find("name", remove);
+      if (role !== null && guildUser.roles.has(role)) guildUser.removeRole(role);
+    });
+
+    userGroups.forEach((role) => {
+      let guildRole = guild.roles.find("name", add);
+      if (role !== null && !guildUser.roles.has(role)) guildUser.addRole(role);
+    });
+  });
 }
 
 async function discordUserFetch(id) {
@@ -134,7 +130,7 @@ module.exports = {
           await User.findOne({"discord.id": message.author.id}).exec().then(async (user) => {
             if (!user) message.author.send(":no_entry_sign: ¡Tu cuenta no se encuentra sincronizada con ninguna cuenta *Minecraft*! :no_entry_sign:");
             if (user) {
-              await sync_roles(user._id).then(() => {
+              await syncRoles(user._id).then(() => {
                 return message.author.send(":arrows_counterclockwise: ¡" + message.author + ", ahora tus rangos de _Discord_ están nuevamente sincronizados con los de tu cuenta _Minecraft_ *" + user.username + "*! :arrows_counterclockwise:");
               }).catch(() => { message.author.send(":no_entry_sign: ¡Ha ocurrido un error al sincronizar tus rangos! :no_entry_sign:"); });
             }
@@ -173,8 +169,6 @@ module.exports = {
           });
 
       const json = await response.json();
-      console.log(json);
-      console.log(json.access_token);
 
       User.findOneAndUpdate({_id: req.query.state}, {
         discord: {
@@ -207,7 +201,7 @@ module.exports = {
                   "\n" +
                   "Recuerda que ahora obtendrás una recompensa IN-Game, en cualquiera de los lobbies puedes dar doble click sobre la sección *Mi Perfil* y luego la sección *Recompensas* para redimirla, recuerda que esto no funciona si ya has añadido anteriormente una cuenta de _Discord_.");
 
-              await sync_roles(req.query.state).then().catch((err) => { console.log(err); });
+              syncRoles(req.query.state);
               res.redirect('http://localhost:4200/cuenta?verified=true');
 
             });
