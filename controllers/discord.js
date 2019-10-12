@@ -194,9 +194,9 @@ module.exports = {
                 {
                   discord: {
                     id: userData.id,
-                    accessToken: updatedUser.accessToken,
-                    refreshToken: updatedUser.refreshToken,
-                    tokenTimestamp: updatedUser.tokenTimestamp
+                    accessToken: updatedUser.discord.accessToken,
+                    refreshToken: updatedUser.discord.refreshToken,
+                    tokenTimestamp: updatedUser.discord.tokenTimestamp
                   }
                 }, {new: true}, async (err, updatedDiscord) => {
 
