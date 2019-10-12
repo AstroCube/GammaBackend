@@ -194,7 +194,7 @@ module.exports = {
               if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
               if (!updatedDiscord) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
 
-              user.send(":white_check_mark:  ¡"+ user +", has sincronizado correctamente tu cuenta con el usuario *" + user_data.username + "*! :white_check_mark:\n" +
+              user.send(":white_check_mark:  ¡"+ user +", has sincronizado correctamente tu cuenta con el usuario *" + userData.username + "*! :white_check_mark:\n" +
                   "\n" +
                   "Recuerda que ahora obtendrás una recompensa IN-Game, en cualquiera de los lobbies puedes dar doble click sobre la sección *Mi Perfil* y luego la sección *Recompensas* para redimirla, recuerda que esto no funciona si ya has añadido anteriormente una cuenta de _Discord_.");
 
