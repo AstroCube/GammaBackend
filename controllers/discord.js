@@ -32,13 +32,13 @@ async function syncRoles(id) {
     const guildUser = guild.member(userData.id);
 
     removeRoles.forEach((role) => {
-      let guildRole = guild.roles.find("name", remove);
-      if (role !== null && guildUser.roles.has(role)) guildUser.removeRole(role);
+      let guildRole = guild.roles.find("name", role);
+      if (guildRole !== null && guildUser.roles.has(role)) guildUser.removeRole(guildRole);
     });
 
     userGroups.forEach((role) => {
-      let guildRole = guild.roles.find("name", add);
-      if (role !== null && !guildUser.roles.has(role)) guildUser.addRole(role);
+      let guildRole = guild.roles.find("name", role);
+      if (guildRole !== null && !guildUser.roles.has(role)) guildUser.addRole(guildRole);
     });
   });
 }
