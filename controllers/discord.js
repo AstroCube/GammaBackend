@@ -190,7 +190,16 @@ module.exports = {
           discordUserFetch(req.query.state).then(async (userData) => {
             let user = client.users.get(userData.id);
 
-            User.findOneAndUpdate({_id: req.query.state}, {discord: {id: userData.id}}, {new: true}, async (err, updatedDiscord) => {
+            User.findOneAndUpdate({_id: req.query.state},
+                {
+                  discord: {
+                    id: userData.id,
+                    accessToken: updatedUser.accessToken,
+                    refreshToken: updatedUser.refreshToken,
+                    tokenTimestamp: updatedUser.tokenTimestamp
+                  }
+                }, {new: true}, async (err, updatedDiscord) => {
+
               if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
               if (!updatedDiscord) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
 
