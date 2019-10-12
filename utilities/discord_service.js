@@ -1,6 +1,6 @@
 "use strict";
 
-const AF = require("@|auxiliar_functions");
+const AF = require("@auxiliar_functions");
 const { URLSearchParams } = require('url');
 const discord_service = require("discord.js");
 const client = new discord_service.Client();
@@ -31,15 +31,15 @@ async function sync_roles(user_id) {
       let user = guild.member(user_data.id);
       await Promise.map(remove_roles, (remove) => {
         let role = guild.roles.find("name", remove);
-        if (user.roles.has(role)) {
+        if (role !== null && user.roles.has(role)) {
           user.removeRole(role).catch((err) => { console.log(err); });
         }
       });
       await Promise.map(user_groups, (add) => {
         let role = guild.roles.find("name", add);
-        if (!user.roles.has(role)) {
+        /*if (role !== null && !user.roles.has(role)) {
           user.addRole(role).catch((err) => { console.log(err); });
-        }
+        }*/
       });
     }).catch((err) => { console.log(err); });
   } catch(err) {
@@ -118,8 +118,11 @@ module.exports = {
           method: 'POST',
           body: formData
         });
+
       const json = await response.json();
 
+      console.log(json);
+      console.log(json.access_token);
       await User.findOneAndUpdate({"_id": req.query.state}, {"discord": {"access_token": json.access_token, "refresh_token": json.refresh_token, "token_timestamp": moment().unix(), "token_expires": moment().add(7, 'days').unix()}}).then(() => {
 
         AF.needed_update(req.query.state).then(async (user_data) => {
@@ -172,13 +175,13 @@ module.exports = {
           let user = guild.member(user_data.id);
           await Promise.map(remove_roles, async (remove) => {
             let role = guild.roles.find("name", remove);
-            if (user.roles.has(role)) {
+            /*if (role !== null && user.roles.has(role)) {
               user.removeRole(role).catch((err) => { console.log(err); });
-            }
+            }*/
           });
-          user.send(":x:  ¡"+ user +", tu cuenta ya no está sincronizada con el jugador de Minecraft  *" + user_data.username + "*! :x:\n" +
+          /*user.send(":x:  ¡"+ user +", tu cuenta ya no está sincronizada con el jugador de Minecraft  *" + user_data.username + "*! :x:\n" +
             "\n" +
-            "Si deseas volver a sincronizarla, simplemente ingresa a https://www.seocraft.net/cuenta, pero esta vez ya no recibirás recompensa.");
+            "Si deseas volver a sincronizarla, simplemente ingresa a https://www.seocraft.net/cuenta, pero esta vez ya no recibirás recompensa.");*/
           user_found.discord = undefined;
           await user_found.save().then((saved) => {
             return res.status(200).send({saved});

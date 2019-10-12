@@ -374,6 +374,7 @@ async function needed_update(id) {
             body: formData
           });
 
+
         const json = await response.json();
 
         user.discord.access_token = json.access_token;
@@ -395,9 +396,10 @@ async function needed_update(id) {
           {
             method: 'GET',
             headers: {
-              Authorization: "Bearer "+ user.discord.access_token,
+              Authorization: "Bearer " + user.discord.access_token,
             },
           });
+        console.log(repsonse.json);
         return await response.json();
       }
     });
