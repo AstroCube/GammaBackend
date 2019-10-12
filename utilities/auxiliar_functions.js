@@ -1,6 +1,5 @@
 "use strict";
-
-const btoa = require("btoa");
+const { URLSearchParams } = require('url');
 const fetch = require("node-fetch");
 const Friend = require("@friend");
 const fs = require("fs");
@@ -361,7 +360,7 @@ async function needed_update(id) {
     return await User.findOne({"_id": id}).exec().then(async (user) => {
       if (user.discord.token_timestamp <= user.discord.token_expires) {
 
-        let formData = new FormData();
+        let formData = new URLSearchParams();
         formData.append("client_id", process.env.DISCORD_CLIENT_ID);
         formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
         formData.append("grant_type", "refresh_token");
@@ -372,8 +371,7 @@ async function needed_update(id) {
         const response = await fetch("https://discordapp.com/api/oauth2/token?grant_type=refresh_token&refresh_token=" + user.discord.refresh_token + "&redirect_uri=" + encodeURIComponent(process.env.DISCORD_REDIRECT_URL),
           {
             method: 'POST',
-            body: formData,
-            headers: {'Content-Type': 'x-www-form-urlencoded'}
+            body: formData
           });
 
         const json = await response.json();

@@ -1,13 +1,13 @@
 "use strict";
 
 const AF = require("@auxiliar_functions");
+const { URLSearchParams } = require('url');
 const discord_service = require("discord.js");
 const client = new discord_service.Client();
 const User = require("@user");
 const Group = require("@group");
 const Promise = require("bluebird");
 const fetch = require("node-fetch");
-const btoa = require("btoa");
 const moment = require("moment");
 
 async function sync_roles(user_id) {
@@ -105,7 +105,7 @@ module.exports = {
       if (!req.query.code) return res.status(404).send({message: "No se ha recibido un codigo de autorización."});
       const code = req.query.code;
 
-      let formData = new FormData();
+      let formData = new URLSearchParams();
       formData.append("client_id", process.env.DISCORD_CLIENT_ID);
       formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
       formData.append("grant_type", "authorization_code");
@@ -116,8 +116,7 @@ module.exports = {
       const response = await fetch("https://discordapp.com/api/oauth2/token?grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent(process.env.DISCORD_REDIRECT_URL),
         {
           method: 'POST',
-          body: formData,
-          headers: {'Content-Type': 'x-www-form-urlencoded'}
+          body: formData
         });
       const json = await response.json();
 
