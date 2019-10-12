@@ -31,10 +31,9 @@ let UserSchema = Schema({
   }],
   discord: {
     id: String,
-    access_token: String,
-    refresh_token: String,
-    token_timestamp: String,
-    token_expires: String
+    accessToken: String,
+    refreshToken: String,
+    tokenTimestamp: String
   },
   logged: String,
   // -- Disguise fields  -- //

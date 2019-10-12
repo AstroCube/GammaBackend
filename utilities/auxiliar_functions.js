@@ -334,80 +334,6 @@ function arithmetic_remaining_xp(level, user_xp) {
   return arithmetic_max_xp(level) - user_xp;
 }
 
-async function database_id(user_id) {
-  try {
-    return await User.findOne({"_id": user_id}).exec().then(async (user) => {
-      const response = await fetch("https://discordapp.com/api/users/@me",
-        {
-          method: 'GET',
-          headers: {
-            Authorization: "Bearer " + user.discord.access_token,
-          },
-        });
-      let json = await response.json();
-      user.discord.id = json.id;
-      return user.save((err, res) => {
-        return res;
-      });
-    });
-  } catch(err) {
-    console.log(err);
-  }
-}
-
-async function needed_update(id) {
-  try {
-    return await User.findOne({"_id": id}).exec().then(async (user) => {
-      if (user.discord.token_timestamp <= user.discord.token_expires) {
-
-        let formData = new URLSearchParams();
-        formData.append("client_id", process.env.DISCORD_CLIENT_ID);
-        formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
-        formData.append("grant_type", "refresh_token");
-        formData.append("refresh_token", user.discord.refresh_token);
-        formData.append("redirect_uri", process.env.DISCORD_REDIRECT_URL);
-        formData.append("scope", "identify");
-
-        const response = await fetch("https://discordapp.com/api/oauth2/token",
-          {
-            method: 'POST',
-            body: formData
-          });
-
-
-        const json = await response.json();
-
-        user.discord.access_token = json.access_token;
-        user.discord.token_timestamp = moment().unix();
-        user.discord.token_expires = moment().add(7, 'days').unix();
-        return await user.save().then(async (updated) => {
-          const response = await fetch("https://discordapp.com/api/users/@me",
-            {
-              method: 'GET',
-              headers: {
-                Authorization: "Bearer "+ updated.discord.access_token,
-              },
-            });
-          return await response.json();
-        }).catch((err) => { console.log(err); });
-
-      } else {
-        const response = await fetch("https://discordapp.com/api/users/@me",
-          {
-            method: 'GET',
-            headers: {
-              Authorization: "Bearer " + user.discord.access_token,
-            },
-          });
-        console.log(repsonse.json);
-        return await response.json();
-      }
-    });
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 function friend_create(id) {
   let friend_document = new Friend();
   friend_document.username = id;
@@ -497,11 +423,9 @@ module.exports = {
   get_feed,
   punishment_placeholder,
   arithmetic_max_xp,
-  database_id,
   file_unlink,
   dynamic_permission,
   inside_group,
-  needed_update,
   friend_create,
   stats_create,
   user_groups_id,

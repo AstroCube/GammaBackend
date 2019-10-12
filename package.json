@@ -81,7 +81,7 @@
     "@user": "models/user",
     "@auxiliar_functions": "utilities/auxiliar_functions",
     "@cluster_service": "utilities/cluster_service",
-    "@discord_service": "utilities/discord_service",
+    "@discord_service": "controllers/discord",
     "@jwt_tokenization": "utilities/jwt_tokenization",
     "@pagination_service": "utilities/pagination_service",
     "@redis_service": "utilities/redis_service",

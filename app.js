@@ -1,7 +1,7 @@
 "use strict";
 // Si me pones publico eres gai
 
-require("./utilities/discord_service").load_bot();
+require("./controllers/discord").load_bot();
 require("./utilities/socket_service").socket_listen();
 const express = require("express");
 const bodyParser = require("body-parser");

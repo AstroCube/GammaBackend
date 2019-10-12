@@ -21,8 +21,8 @@ api.get("/user/email-verification", md_auth.ensureAuth, user_controller.email_ve
 api.put("/user/email-update", md_auth.ensureAuth, user_controller.email_update);
 
 // -- Discord sync routes -- //
-api.get("/discord-sync", discord_service.discord_redirect);
-api.get("/discord-sync/callback", discord_service.discord_sync);
+api.get("/discord-sync", discord_service.discordRedirect);
+api.get("/discord-sync/callback", discord_service.discordSync);
 api.get("/discord-logout/:id", discord_service.discord_logout);
 api.get("/discord-placeholder/:id?", md_auth.ensureAuth, discord_service.website_placeholder);
 
