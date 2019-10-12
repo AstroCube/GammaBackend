@@ -341,7 +341,7 @@ async function database_id(user_id) {
         {
           method: 'GET',
           headers: {
-            Authorization: "Bearer "+ user.discord.access_token,
+            Authorization: "Bearer " + user.discord.access_token,
           },
         });
       let json = await response.json();
@@ -368,7 +368,7 @@ async function needed_update(id) {
         formData.append("redirect_uri", process.env.DISCORD_REDIRECT_URL);
         formData.append("scope", "identify");
 
-        const response = await fetch("https://discordapp.com/api/oauth2/token?grant_type=refresh_token&refresh_token=" + user.discord.refresh_token + "&redirect_uri=" + encodeURIComponent(process.env.DISCORD_REDIRECT_URL),
+        const response = await fetch("https://discordapp.com/api/oauth2/token",
           {
             method: 'POST',
             body: formData

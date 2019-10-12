@@ -1,6 +1,6 @@
 "use strict";
 
-const AF = require("@auxiliar_functions");
+const AF = require("@|auxiliar_functions");
 const { URLSearchParams } = require('url');
 const discord_service = require("discord.js");
 const client = new discord_service.Client();
