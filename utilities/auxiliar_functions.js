@@ -360,15 +360,24 @@ async function needed_update(id) {
   try {
     return await User.findOne({"_id": id}).exec().then(async (user) => {
       if (user.discord.token_timestamp <= user.discord.token_expires) {
-        const creds = btoa(process.env.DISCORD_CLIENT_ID + ":" + process.env.DISCORD_CLIENT_SECRET);
+
+        let formData = new FormData();
+        formData.append("client_id", process.env.DISCORD_CLIENT_ID);
+        formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
+        formData.append("grant_type", "refresh_token");
+        formData.append("refresh_token", user.discord.refresh_token);
+        formData.append("redirect_uri", process.env.DISCORD_REDIRECT_URL);
+        formData.append("scope", "identify");
+
         const response = await fetch("https://discordapp.com/api/oauth2/token?grant_type=refresh_token&refresh_token=" + user.discord.refresh_token + "&redirect_uri=" + encodeURIComponent(process.env.DISCORD_REDIRECT_URL),
           {
             method: 'POST',
-            headers: {
-              Authorization: "Basic "+ creds,
-            },
+            body: formData,
+            headers: {'Content-Type': 'x-www-form-urlencoded'}
           });
+
         const json = await response.json();
+
         user.discord.access_token = json.access_token;
         user.discord.token_timestamp = moment().unix();
         user.discord.token_expires = moment().add(7, 'days').unix();
@@ -382,6 +391,7 @@ async function needed_update(id) {
             });
           return await response.json();
         }).catch((err) => { console.log(err); });
+
       } else {
         const response = await fetch("https://discordapp.com/api/users/@me",
           {

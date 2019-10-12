@@ -104,16 +104,25 @@ module.exports = {
     try {
       if (!req.query.code) return res.status(404).send({message: "No se ha recibido un codigo de autorización."});
       const code = req.query.code;
-      const creds = btoa( process.env.DISCORD_CLIENT_ID + ":" + process.env.DISCORD_CLIENT_SECRET);
+
+      let formData = new FormData();
+      formData.append("client_id", process.env.DISCORD_CLIENT_ID);
+      formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
+      formData.append("grant_type", "authorization_code");
+      formData.append("code", code);
+      formData.append("redirect_uri", process.env.DISCORD_REDIRECT_URL);
+      formData.append("scope", "identify");
+
       const response = await fetch("https://discordapp.com/api/oauth2/token?grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent(process.env.DISCORD_REDIRECT_URL),
         {
           method: 'POST',
-          headers: {
-            Authorization: "Basic "+ creds,
-          },
+          body: formData,
+          headers: {'Content-Type': 'x-www-form-urlencoded'}
         });
       const json = await response.json();
+
       await User.findOneAndUpdate({"_id": req.query.state}, {"discord": {"access_token": json.access_token, "refresh_token": json.refresh_token, "token_timestamp": moment().unix(), "token_expires": moment().add(7, 'days').unix()}}).then(() => {
+
         AF.needed_update(req.query.state).then(async (user_data) => {
           let user = client.users.get(user_data.id);
           user.send(":white_check_mark:  ¡"+ user +", has sincronizado correctamente tu cuenta con el usuario *" + user_data.username + "*! :white_check_mark:\n" +
@@ -125,6 +134,7 @@ module.exports = {
         }).catch((err) => {
           console.log(err);
         });
+
       });
     } catch (err) {
       console.log(err);
