@@ -173,45 +173,46 @@ module.exports = {
           });
 
       const json = await response.json();
-
       console.log(json);
       console.log(json.access_token);
+
+      User.findOneAndUpdate({_id: req.query.state}, {
+        discord: {
+          accessToken: json.access_token,
+          refreshToken: json.refresh_token,
+          tokenTimestamp: moment().unix()
+        }}, {new: true}, (err, updatedUser) => {
+
+        if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
+        if (!updatedUser) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
+
+        try {
+          discordUserFetch(req.query.state).then(async (userData) => {
+            let user = client.users.get(userData.id);
+
+            User.findOneAndUpdate({_id: req.query.state}, {discord: {id: userData.id}}, {new: true}, async (err, updatedDiscord) => {
+              if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
+              if (!updatedDiscord) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
+
+              user.send(":white_check_mark:  ¡"+ user +", has sincronizado correctamente tu cuenta con el usuario *" + user_data.username + "*! :white_check_mark:\n" +
+                  "\n" +
+                  "Recuerda que ahora obtendrás una recompensa IN-Game, en cualquiera de los lobbies puedes dar doble click sobre la sección *Mi Perfil* y luego la sección *Recompensas* para redimirla, recuerda que esto no funciona si ya has añadido anteriormente una cuenta de _Discord_.");
+
+              await sync_roles(req.query.state).then().catch((err) => { console.log(err); });
+              res.redirect('http://localhost:4200/cuenta?verified=true');
+
+            });
+          });
+        } catch (err) {
+          return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de Discord."});
+        }
+
+      });
+
     } catch (err) {
       return res.status(500).send({message: "Ha ocurrido un error al sincronizar discord."});
     }
 
-    User.findOneAndUpdate({_id: req.query.state}, {
-          discord: {
-            accessToken: json.access_token,
-            refreshToken: json.refresh_token,
-            tokenTimestamp: moment().unix()
-          }}, {new: true}, (err, updatedUser) => {
-
-      if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
-      if (!updatedUser) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
-
-      try {
-        discordUserFetch(req.query.state).then(async (userData) => {
-          let user = client.users.get(userData.id);
-
-          User.findOneAndUpdate({_id: req.query.state}, {discord: {id: userData.id}}, {new: true}, async (err, updatedDiscord) => {
-            if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
-            if (!updatedDiscord) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
-
-            user.send(":white_check_mark:  ¡"+ user +", has sincronizado correctamente tu cuenta con el usuario *" + user_data.username + "*! :white_check_mark:\n" +
-                "\n" +
-                "Recuerda que ahora obtendrás una recompensa IN-Game, en cualquiera de los lobbies puedes dar doble click sobre la sección *Mi Perfil* y luego la sección *Recompensas* para redimirla, recuerda que esto no funciona si ya has añadido anteriormente una cuenta de _Discord_.");
-
-            await sync_roles(req.query.state).then().catch((err) => { console.log(err); });
-            res.redirect('http://localhost:4200/cuenta?verified=true');
-
-          });
-        });
-      } catch (err) {
-        return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de Discord."});
-      }
-
-    });
   },
 
   website_placeholder: async function(req, res) {
@@ -219,7 +220,7 @@ module.exports = {
       let id;
       if(!req.params.id) { id = req.user.sub; } else { id = req.params.id; }
       await User.findOne({"_id": id}).select("discord").exec().then(async (user) => {
-        await AF.needed_update(user._id).then((user_data) => {
+        await discordUserFetch(user._id).then((user_data) => {
           return res.status(200).send({
             username: user_data.username,
             avatar: user_data.avatar
@@ -240,7 +241,7 @@ module.exports = {
             remove_roles.push(role.discord_role);
           });
         }).catch(() => {});
-        AF.needed_update(user_found._id).then(async (user_data) => {
+        discordUserFetch(user_found._id).then(async (user_data) => {
           let guild = client.guilds.get(process.env.DISCORD_GUILD);
           let user = guild.member(user_data.id);
           await Promise.map(remove_roles, async (remove) => {
