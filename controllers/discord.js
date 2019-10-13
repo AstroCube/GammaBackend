@@ -226,6 +226,7 @@ module.exports = {
         await discordUserFetch(user._id).then((user_data) => {
           return res.status(200).send({
             username: user_data.username,
+            discriminator: user_data.discriminator,
             avatar: user_data.avatar
           });
         }).catch(() => {});
