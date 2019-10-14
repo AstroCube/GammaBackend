@@ -60,7 +60,7 @@ module.exports = {
     let query = {_id: req.user.sub};
     if (req.params.user) {$or: [{_id: req.params.user}, {username_lowercase: req.params.user.toLowerCase()}]};
 
-    User.findOne(query, (err, user) => {
+    User.findOne(query).lean().exec((err, user) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al encontrar al usuario."});
       if (!user) return res.status(404).send({message: "No se ha encontrado al usuario."});
 
