@@ -58,14 +58,14 @@ module.exports = {
   },
 
   getStaffList: function(req, res) {
-    Group.find({staff: true}).select("_id name html_color staff discord_role badge_color badge_link").exec((err, groups) => {
+    Group.find({staff: true}).select("_id name html_color staff discord_role badge_color badge_link").sort("priority").exec((err, groups) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
       return res.status(200).send(groups);
     });
   },
 
   getGroupList: function(req, res) {
-    Group.find().select({minecraft_permissions: 0, minecraft_flair: 0, web_permissions: 0}).exec((err, groups) => {
+    Group.find().select({minecraft_permissions: 0, minecraft_flair: 0, web_permissions: 0}).sort("priority").exec((err, groups) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
       return res.status(200).send(groups);
     });
