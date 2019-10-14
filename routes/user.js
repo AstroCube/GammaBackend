@@ -14,7 +14,7 @@ api.put("/user/update-user/:id", md_auth.ensureAuth, user_controller.update_user
 api.get("/user/get-user/:user?", md_auth.ensureAuth, user_controller.get_user);
 api.get("/user/get-profile/:user?", md_auth.ensureAuth, user_controller.get_profile);
 api.get("/user/get-users", md_auth.ensureAuth, user_controller.get_users);
-api.get("/user/list-names", md_auth.ensureAuth, user_controller.user_list);
+api.get("/user/list-names/:own?", md_auth.ensureAuth, user_controller.user_list);
 api.get("/user/get-placeholder/:id?", md_auth.ensureAuth, user_controller.getPlaceholder);
 api.post("/user/permission-checker", md_auth.ensureAuth, user_controller.permission_checker);
 api.get("/user/email-verification", md_auth.ensureAuth, user_controller.email_verification);
