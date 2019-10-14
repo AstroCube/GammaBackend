@@ -64,7 +64,7 @@ module.exports = {
     Friend
         .find({$or: [{sender: req.params.id}, {receiver: req.params.id}]})
         .populate("sender receiver")
-        .select({sender: {username: 1, skin: 1}, receiver: {username: 1, skin: 1}})
+        .select({'sender.username': 1, 'sender.skin': 1, 'receiver.username': 1, 'receiver.skin': 1})
         .exec((err, friendList) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de amigos."});
       return res.status(200).send(friendList);
