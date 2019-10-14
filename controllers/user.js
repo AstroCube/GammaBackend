@@ -304,7 +304,7 @@ module.exports = {
         if (req.params.own) return username._id.toString() !== process.env.GUEST_USER;
         return username._id.toString() !== process.env.GUEST_USER && username._id.toString() !== req.user.sub;
       });
-      return res.status(200).send({fixedUsers});
+      return res.status(200).send(fixedUsers);
     });
   }
 
