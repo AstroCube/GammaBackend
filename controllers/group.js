@@ -19,9 +19,24 @@ module.exports = {
     });
   },
 
+  updateGroup: function(req, res) {
+
+    let params = req.body;
+    delete params.minecraft_flair;
+    delete params.minecraft_permissions;
+    delete params.web_permissions;
+    delete params.staff;
+
+    Group.findOneAndUpdate({_id: req.params.id}, params, (err, updatedGroup) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al actualizar el grupo."});
+      if (!updatedGroup) return res.status(404).send({message: "No se ha encontrado el grupo."});
+      return res.status(200).send(updatedGroup);
+    });
+  },
+
   getGroup: function(req, res) {
     Group.findOne({_id: req.params.id}).select({minecraft_permissions: 0, minecraft_flair: 0, web_permissions: 0}).exec((err, group) => {
-      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el grupo."});
       if (!group) return res.status(404).send({message: "No se ha encontrado el grupo."});
       return res.status(200).send(group);
     });
