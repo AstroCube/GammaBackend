@@ -42,7 +42,8 @@ let UserSchema = Schema({
   disguise_lowercase: String,
   disguise_group: {
     type: Schema.ObjectId,
-    ref: 'Group'},
+    ref: 'Group'
+  },
   disguise_history: [{
     _id: false,
    nickname: String,

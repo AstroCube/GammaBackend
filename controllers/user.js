@@ -56,7 +56,7 @@ module.exports = {
     });
   },
 
-  get_user: function(req, res) {
+  getUser: function(req, res) {
     let query;
     if(!req.params.user) {
       if (!req.user) return res.status(200).send({message: ""});
@@ -66,9 +66,13 @@ module.exports = {
     }
 
     User.findOne({_id: query}, (err, user) => {
-      if (err) return res.status(500).send({message: 'Error en la peticion'});
-      if (!user) return res.status(404).send({message: 'El usuario no existe'});
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al encontrar al usuario."});
+      if (!user) return res.status(404).send({message: "No se ha encontrado al usuario."});
+
       delete user.password;
+      delete user.email;
+      delete user.discord;
+
       return res.status(200).send({user});
     });
   },
@@ -87,13 +91,17 @@ module.exports = {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el prefix del usuario."});
       if (!user) return res.status(404).send({message: "No se ha encontrado el usuario solicitado."});
 
-      let badges = await Promise.map(user.group, async (groups) => {
-        return await Group.findOne({_id : groups._id}).exec().then((group) => {
-          return group;
-        }).catch((err) => {
-          console.log(err);
+      let badges = [];
+      try {
+        badges =await Promise.map(user.group, async (groups) => {
+          return await Group.findOne({_id : groups._id}).exec().then((group) => {
+            return group;
+          });
         });
-      });
+      } catch (err) {
+
+      }
+
       badges.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
 
       return res.status(200).send({

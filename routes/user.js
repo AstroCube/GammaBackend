@@ -11,7 +11,7 @@ api.post("/user/login-website", user_controller.login_user);
 api.get("/user/token-validation", md_auth.ensureAuth, user_controller.token_validation);
 api.post("/user/password-update", md_auth.ensureAuth, user_controller.password_update);
 api.put("/user/update-user/:id", md_auth.ensureAuth, user_controller.update_user);
-api.get("/user/get-user/:user?", md_auth.ensureAuth, user_controller.get_user);
+api.get("/user/get-user/:user?", md_auth.ensureAuth, user_controller.getUser);
 api.get("/user/get-profile/:user?", md_auth.ensureAuth, user_controller.get_profile);
 api.get("/user/get-users", md_auth.ensureAuth, user_controller.get_users);
 api.get("/user/list-names/:own?", md_auth.ensureAuth, user_controller.user_list);
