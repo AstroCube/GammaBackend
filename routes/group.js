@@ -12,5 +12,6 @@ api.put("/group/update/:id", mdAuth.ensureAuth, GroupController.updateGroup);
 api.get("/group/get/:id", mdAuth.ensureAuth, GroupController.getGroup);
 api.get("/group/list", mdAuth.ensureAuth, GroupController.getGroupList);
 api.post("/group/add/:id", mdAuth.ensureAuth, GroupController.userGroupAdd);
+api.post("/group/remove/:id", mdAuth.ensureAuth, GroupController.userGroupRemove);
 
 module.exports = api;

@@ -35,6 +35,28 @@ module.exports = {
     }
   },
 
+  userGroupRemove: function(req, res) {
+
+    let params = req.body;
+
+    if (params.group) {
+      User.findOne({_id: req.params.id}, (err, user) => {
+        if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener al usuario."});
+        if (!user) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
+
+        if (!user.group.some(e => e._id.toString() === params.group.toString())) return res.status(400).send({message: "El usuario no se encuentra dentro del grupo."});
+
+        user.group = user.group.filter((group) => group._id.toString() !== params.group.toString());
+        user.save((err, updatedUser) => {
+          if (err || !updatedUser) return res.status(500).send({message: "Ha ocurrido un error al actualizar el usuario."});
+          return res.status(200).send(updatedUser);
+        });
+      });
+    } else {
+      return res.status(400).send({message: "No se ha enviado la petición correctamente."});
+    }
+  },
+
   getStaffList: function(req, res) {
     Group.find({staff: true}).select("_id name html_color staff discord_role badge_color badge_link").exec((err, groups) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
