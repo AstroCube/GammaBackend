@@ -60,6 +60,17 @@ module.exports = {
     });
   },
 
+  listFriendsWebsite: function(req, res) {
+    Friend
+        .find({$or: [{sender: req.params.id}, {receiver: req.params.id}]})
+        .populate("sender receiver")
+        .select("sender.username receiver.username sender.skin username.skin")
+        .exec((err, friendList) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de amigos."});
+      return res.status(200).send(friendList);
+    });
+  },
+
   clearFriends: function(req, res) {
     Friend.find({$or: [{sender: req.params.id}, {receiver: req.params.id}]}, async (err, friendList) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de amigos."});
