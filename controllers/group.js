@@ -12,6 +12,21 @@ module.exports = {
     });
   },
 
+  getGroupList: function(req, res) {
+    Group.find().select({minecraft_permissions: 0, minecraft_flair: 0, web_permissions: 0}).exec((err, groups) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
+      return res.status(200).send(groups);
+    });
+  },
+
+  getGroup: function(req, res) {
+    Group.findOne({_id: req.params.id}).select({minecraft_permissions: 0, minecraft_flair: 0, web_permissions: 0}).exec((err, group) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
+      if (!group) return res.status(404).send({message: "No se ha encontrado el grupo."});
+      return res.status(200).send(group);
+    });
+  },
+
   getStaffMembers: function(req, res) {
     Group.findOne({_id: req.params.id}, (err, group) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el grupo."});
@@ -24,6 +39,6 @@ module.exports = {
       });
 
     });
-  }
+  },
 
 };

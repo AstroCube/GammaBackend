@@ -26,6 +26,9 @@ let GroupSchema = Schema({
     user: {
       manage: Boolean
     },
+    group: {
+      manage: Boolean
+    },
     category: {
       manage: Boolean
     },

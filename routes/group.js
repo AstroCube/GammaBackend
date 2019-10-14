@@ -8,5 +8,7 @@ let api = express.Router();
 
 api.get("/group/staff", mdAuth.ensureAuth, GroupController.getStaffList);
 api.get("/group/staff-members/:id", mdAuth.ensureAuth, GroupController.getStaffMembers);
+api.get("/group/get/:id", mdAuth.ensureAuth, GroupController.getGroup);
+api.get("/group/list", mdAuth.ensureAuth, GroupController.getGroupList);
 
 module.exports = api;
