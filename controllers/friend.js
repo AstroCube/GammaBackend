@@ -61,27 +61,31 @@ module.exports = {
   },
 
   listFriendsWebsite: function(req, res) {
-    Friend.find({$or: [{sender: req.params.id}, {receiver: req.params.id}]}).populate("sender receiver").lean().exec((err, friendList) => {
+    Friend.find({$or: [{sender: req.params.id}, {receiver: req.params.id}]}).populate("sender receiver").lean().exec(async (err, friendList) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de amigos."});
 
       // This will store all the friends of the user
       let queriedFriends = [];
 
-      friendList = friendList.map((friendship) => {
-        if (friendship.sender._id.toString() === req.params.id) {
-          queriedFriends.push(friendship.receiver._id.toString());
-          return {
-            username: friendship.receiver.username,
-            skin: friendship.receiver.skin
-          };
-        } else {
-          queriedFriends.push(friendship.sender._id.toString());
-          return {
-            username: friendship.sender.username,
-            skin: friendship.sender.skin
-          };
-        }
-      });
+      try {
+        friendList = await friendList.map((friendship) => {
+          if (friendship.sender._id.toString() === req.params.id) {
+            queriedFriends.push(friendship.receiver._id.toString());
+            return {
+              username: friendship.receiver.username,
+              skin: friendship.receiver.skin
+            };
+          } else {
+            queriedFriends.push(friendship.sender._id.toString());
+            return {
+              username: friendship.sender.username,
+              skin: friendship.sender.skin
+            };
+          }
+        });
+      } catch (error) {
+        return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de amigos."});
+      }
 
       // Will get friends in common by a query
       Friend.find(
