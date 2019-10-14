@@ -57,15 +57,10 @@ module.exports = {
   },
 
   getUser: function(req, res) {
-    let query;
-    if(!req.params.user) {
-      if (!req.user) return res.status(200).send({message: ""});
-      query = req.user.sub;
-    } else {
-      query = req.params.user;
-    }
+    let query = {_id: req.user.sub};
+    if (req.params.user) {$or: [{_id: req.params.user}, {username_lowercase: req.params.user.toLowerCase()}]};
 
-    User.findOne({_id: query}, (err, user) => {
+    User.findOne(query, (err, user) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al encontrar al usuario."});
       if (!user) return res.status(404).send({message: "No se ha encontrado al usuario."});
 
