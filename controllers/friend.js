@@ -61,12 +61,20 @@ module.exports = {
   },
 
   listFriendsWebsite: function(req, res) {
-    Friend
-        .find({$or: [{sender: req.params.id}, {receiver: req.params.id}]})
-        .populate("sender receiver")
-        .select({'sender.username': 1, 'sender.skin': 1, 'receiver.username': 1, 'receiver.skin': 1})
-        .exec((err, friendList) => {
+    Friend.find({$or: [{sender: req.params.id}, {receiver: req.params.id}]}).populate("sender receiver").lean().exec((err, friendList) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de amigos."});
+      friendList = friendList.map((friendship) => {
+        return {
+          sender: {
+            username: friendship.sender.username,
+            skin: friendship.sender.skin
+          },
+          receiver: {
+            username: friendship.receiver.username,
+            skin: friendship.receiver.skin
+          }
+        };
+      });
       return res.status(200).send(friendList);
     });
   },
