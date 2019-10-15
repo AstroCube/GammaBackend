@@ -89,6 +89,18 @@ module.exports = {
 
       return res.status(200);
     });
+  },
+
+  matchGetPlayer: function(req, res) {
+    Match.find({"teams.members.user": req.params.user}).sort("createdAt").lean().exec((err, matches) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener las partidas."});
+      let wonMatches = matches.filter((match) => match.winner.includes(req.params.user));
+      return res.status(200).send({
+        wonMatches: wonMatches.length,
+        playedMatches: matches.length,
+        lastMatches: matches.slice(0, 10)
+      });
+    });
   }
 
 };
