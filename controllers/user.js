@@ -7,6 +7,7 @@ const Group = require("@group");
 const jwt = require("@jwt_tokenization");
 const mailer = require("@smtp_service");
 const moment = require("moment");
+const mongoose = require("mongoose");
 const Promise = require ("bluebird");
 const redis = require("@redis_service");
 const User = require("@user");
