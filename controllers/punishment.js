@@ -139,6 +139,13 @@ module.exports = {
     } else {
       return res.status(400).send({message: "No se ha enviado correctamente la solicitúd."});
     }
+  },
+
+  punishmentListUser: function(req, res) {
+    Punishment.find({punished: req.params.id}, (err, punishments) => {
+      if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener las sanciones del usuario."});
+      return res.status(200).send(punishments);
+    });
   }
 
 };
