@@ -59,9 +59,11 @@ module.exports = {
 
   getUser: function(req, res) {
 
-    let query = {username_lowercase: req.params.user.toLowerCase()};
+    let query = {};
     if (mongoose.Types.ObjectId.isValid(req.params.user)) {
       query = {_id: req.params.user};
+    } else {
+      query = {username_lowercase: req.params.user.toLowerCase()};
     }
 
     User.findOne(query).lean().exec((err, user) => {
