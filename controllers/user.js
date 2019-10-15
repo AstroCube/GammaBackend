@@ -60,15 +60,19 @@ module.exports = {
   getUser: function(req, res) {
 
     let query = {};
+    let own = false;
     if (mongoose.Types.ObjectId.isValid(req.params.user)) {
       query = {_id: req.params.user};
-    } else {
+    } else if (req.params.user) {
       query = {username_lowercase: req.params.user.toLowerCase()};
+    } else {
+      query = {_id: req.user.sub};
+      own = true;
     }
 
     User.findOne(query).lean().exec((err, user) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al encontrar al usuario."});
-      if (user._id.toString() === process.env.GUEST_USER) return res.status(400);
+      if (user._id.toString() === process.env.GUEST_USER && !own) return res.status(400);
       if (!user) return res.status(404).send({message: "No se ha encontrado al usuario."});
 
       delete user.password;
