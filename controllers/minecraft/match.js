@@ -2,7 +2,7 @@
 
 const Match = require("@match");
 const moment = require("moment");
-const mongoose = require("mongoose");
+const ObjectId = require("mongoose").Types.ObjectId;
 const Promise = require("bluebird");
 const Server = require("@server");
 
@@ -93,7 +93,9 @@ module.exports = {
   },
 
   matchGetPlayer: function(req, res) {
-    Match.find({"teams.members.user": mongoose.Types.ObjectId(req.params.user)}).sort("createdAt").lean().exec((err, matches) => {
+    let objectId = new ObjectId(req.params.user);
+    console.log(objectId);
+    Match.find({"teams.members.user": new ObjectId(req.params.user)}).sort("createdAt").lean().exec((err, matches) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener las partidas."});
       let wonMatches = matches.filter((match) => match.winner.includes(req.params.user));
       return res.status(200).send({
