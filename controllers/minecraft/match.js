@@ -93,11 +93,16 @@ module.exports = {
   },
 
   matchGetPlayer: function(req, res) {
-    Match.find({"teams.members.user": req.params.user}).sort("createdAt").lean().exec((err, matches) => {
+    Match.find({"teams.members.user": req.params.user}).populate("gamemode").sort("createdAt").lean().exec((err, matches) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener las partidas."});
-      let wonMatches = matches.filter((match) => match.winner.includes(req.params.user));
+      let wonMatches = 0;
+      matches.forEach((match) => {
+        match.winner.forEach((winner) => {
+          if (winner.toString() === req.params.user) wonMatches++; 
+        });
+      });
       return res.status(200).send({
-        wonMatches: wonMatches.length,
+        wonMatches: wonMatches,
         playedMatches: matches.length,
         lastMatches: matches.slice(0, 10)
       });
