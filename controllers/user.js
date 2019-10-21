@@ -72,8 +72,8 @@ module.exports = {
 
     User.findOne(query).lean().exec((err, user) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al encontrar al usuario."});
-      if (user._id.toString() === process.env.GUEST_USER && !own) return res.status(400);
       if (!user) return res.status(404).send({message: "No se ha encontrado al usuario."});
+      if (user._id.toString() === process.env.GUEST_USER && !own) return res.status(400);
 
       delete user.password;
       delete user.email;
