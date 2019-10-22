@@ -175,7 +175,7 @@ module.exports = {
           redis.redisClient.set("verification_" + user.username_lowercase, random);
           redis.redisClient.expire("verification_" + user.username_lowercase, 600);
           if (err) return res.status(500).send({message: "Ha ocurrido un error al enviar el correo de verificación."});
-          return res.status(200);
+          return res.status(200).send({email_sent: true});
         });
       });
     });
