@@ -165,7 +165,7 @@ module.exports = {
     User.findOne({_id: req.params.id}, (err, user) => {
       if (!user || err) return res.status(500).send({message: "Ha ocurrido un error al enviar el correo de verificación."});
       redis.redisClient.exists("verification_" + user.username_lowercase, (err, reply) => {
-        if (reply) return res.status(400);
+        if (reply) return res.status(400).send({message: "¡Ya se ha enviado anteriormente un correo de verificación!"});
         if (err) return res.status(500).send({message: "Ha ocurrido un error al enviar el correo de verificación."});
         let random = Math.floor(Math.pow(10, 6-1) + Math.random() * (Math.pow(6, 6) - Math.pow(6, 6-1) - 1));
         mailer.sendMail(user.email, "Actualiza tu mail - " + user.username,
