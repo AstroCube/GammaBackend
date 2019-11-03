@@ -14,7 +14,12 @@ let StatsSchema = Schema({
     coins: { type: Number, default: 0 },
     kits: [
         String
-    ]
+    ],
+    cages: [
+        String
+    ],
+    currentKit: String,
+    currentCage: String
   }
 });
 
