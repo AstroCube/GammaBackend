@@ -20,6 +20,10 @@ let StatsSchema = Schema({
     ],
     currentKit: String,
     currentCage: String
+  },
+  tntGames: {
+    runDoubleJump: {types: Number, default: 2},
+    coins: {types: Number, default: 0}
   }
 });
 
