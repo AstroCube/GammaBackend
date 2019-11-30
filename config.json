@@ -1,0 +1,18 @@
+{
+	"BACKEND_URL":"127.0.0.1",
+	"BACKEND_PORT":"3800",
+	"MONGO_URI":"mongodb://pWvrOJYiBmIt7BfDqpRC:uNhaW7cseV3B6n7HaCV2@127.0.0.1:27017/mw1xYqbBccgB2OoREwC1?authSource=admin",
+	"TOKENIZATION_SECRET":"bn~zvOjV+7Qsi|1n6A",
+	"DISCORD_CLIENT_ID":"460844053672493086",
+	"DISCORD_CLIENT_SECRET":"qAEKD_wLmNAfP2kMQHbo180e_bjQOJEm",
+	"DISCORD_BOT_KEY":"NDYwODQ0MDUzNjcyNDkzMDg2.DhL9dQ.RjJc01XM0J6A7Dun7ivpHxMWI64",
+	"DISCORD_REDIRECT_URL":"https://www.seocraft.net/api/discord-sync/callback",
+	"DISCORD_GUILD":"408057870597488640",
+	"SMTP_HOST":"smtp.migadu.com",
+	"SMTP_PORT":"587",
+	"SMTP_SECURE":false,
+	"SMTP_AUTH_USER":"support@seocraft.net",
+	"SMTP_AUTH_PASSWORD":"TwilightSparkleIsTheBestPony",
+	"DEFAULT_GROUP":"5b52b2048284865491b1f56a",
+	"GUEST_USER":"5c27b62a8f9c611600fdfa20"
+}

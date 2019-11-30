@@ -8,6 +8,7 @@ const Group = require("@group");
 const Promise = require("bluebird");
 const fetch = require("node-fetch");
 const moment = require("moment");
+const config = require("../config.json");
 
 async function syncRoles(id) {
   let removeRoles = [];
@@ -28,7 +29,7 @@ async function syncRoles(id) {
 
   await discordUserFetch(id).then(async (userData) => {
 
-    const guild = client.guilds.get(process.env.DISCORD_GUILD);
+    const guild = client.guilds.get(config.DISCORD_GUILD);
     const guildUser = guild.member(userData.id);
 
     removeRoles.forEach((role) => {
@@ -49,11 +50,11 @@ async function discordUserFetch(id) {
 
     if (moment().unix() > moment.unix(user.tokenTimestamp).add(7, 'days').unix()) {
       let formData = new URLSearchParams();
-      formData.append("client_id", process.env.DISCORD_CLIENT_ID);
-      formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
+      formData.append("client_id", config.DISCORD_CLIENT_ID);
+      formData.append("client_secret", config.DISCORD_CLIENT_SECRET);
       formData.append("grant_type", "refresh_token");
       formData.append("refresh_token", user.discord.refreshToken);
-      formData.append("redirect_uri", process.env.DISCORD_REDIRECT_URL);
+      formData.append("redirect_uri", config.DISCORD_REDIRECT_URL);
       formData.append("scope", "identify");
 
       const response = await fetch("https://discordapp.com/api/oauth2/token",
@@ -141,11 +142,11 @@ module.exports = {
       }
     });
 
-    client.login(process.env.DISCORD_BOT_KEY);
+    client.login(config.DISCORD_BOT_KEY);
   },
   
   discordRedirect: function(req, res) {
-    res.redirect("https://discordapp.com/oauth2/authorize?client_id=" + process.env.DISCORD_CLIENT_ID + "&scope=identify&response_type=code&redirect_uri=" + encodeURIComponent(process.env.DISCORD_REDIRECT_URL) + "&state=" + req.query.id);
+    res.redirect("https://discordapp.com/oauth2/authorize?client_id=" + config.DISCORD_CLIENT_ID + "&scope=identify&response_type=code&redirect_uri=" + encodeURIComponent(config.DISCORD_REDIRECT_URL) + "&state=" + req.query.id);
   },
   
   discordSync: async function(req, res) {
@@ -154,15 +155,15 @@ module.exports = {
     const code = req.query.code;
 
     let formData = new URLSearchParams();
-    formData.append("client_id", process.env.DISCORD_CLIENT_ID);
-    formData.append("client_secret", process.env.DISCORD_CLIENT_SECRET);
+    formData.append("client_id", config.DISCORD_CLIENT_ID);
+    formData.append("client_secret", config.DISCORD_CLIENT_SECRET);
     formData.append("grant_type", "authorization_code");
     formData.append("code", code);
-    formData.append("redirect_uri", process.env.DISCORD_REDIRECT_URL);
+    formData.append("redirect_uri", config.DISCORD_REDIRECT_URL);
     formData.append("scope", "identify");
 
     try {
-      const response = await fetch("https://discordapp.com/api/oauth2/token?grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent(process.env.DISCORD_REDIRECT_URL),
+      const response = await fetch("https://discordapp.com/api/oauth2/token?grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent(config.DISCORD_REDIRECT_URL),
           {
             method: 'POST',
             body: formData
@@ -246,7 +247,7 @@ module.exports = {
           });
         }).catch(() => {});
         discordUserFetch(user_found._id).then(async (user_data) => {
-          let guild = client.guilds.get(process.env.DISCORD_GUILD);
+          let guild = client.guilds.get(config.DISCORD_GUILD);
           let user = guild.member(user_data.id);
           await Promise.map(remove_roles, async (remove) => {
             let role = guild.roles.find("name", remove);
