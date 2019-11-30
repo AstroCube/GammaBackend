@@ -22,8 +22,8 @@ let StatsSchema = Schema({
     currentCage: String
   },
   tntGames: {
-    runDoubleJump: {types: Number, default: 2},
-    coins: {types: Number, default: 0}
+    runDoubleJump: {type: Number, default: 2},
+    coins: {type: Number, default: 0}
   }
 });
 
