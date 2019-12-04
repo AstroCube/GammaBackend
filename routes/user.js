@@ -8,6 +8,7 @@ const user_controller = require("@user_controller");
 
 let api = express.Router();
 
+api.get('/favicon.ico', (req, res) => res.status(204));
 api.post("/user/login-website", user_controller.login_user);
 api.get("/user/token-validation", md_auth.ensureAuth, user_controller.token_validation);
 api.post("/user/password-update", md_auth.ensureAuth, user_controller.password_update);
