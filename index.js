@@ -4,7 +4,7 @@ require('module-alias/register');
 const mongoose = require("mongoose");
 const app = require("./app");
 const config = require("./config.json");
-const backend = config.BACKEND_URL + "";
+const backend = '127.0.0.1';
 
 
 mongoose.Promise = global.Promise;

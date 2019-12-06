@@ -1,5 +1,4 @@
 {
-	"BACKEND_URL":"127.0.0.1",
 	"FRONTEND_URL": "https://www.seocraft.net",
 	"MONGO_URI":"mongodb://pWvrOJYiBmIt7BfDqpRC:uNhaW7cseV3B6n7HaCV2@127.0.0.1:27017/mw1xYqbBccgB2OoREwC1?authSource=admin",
 	"TOKENIZATION_SECRET":"bn~zvOjV+7Qsi|1n6A",
