@@ -1,6 +1,5 @@
 "use strict";
 
-require('dotenv').config();
 require('module-alias/register');
 const mongoose = require("mongoose");
 const app = require("./app");

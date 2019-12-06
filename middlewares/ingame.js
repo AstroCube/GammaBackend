@@ -1,6 +1,7 @@
 "use strict";
 
 const jwt = require("jwt-simple");
+const config = require("../config");
 
 exports.ensureAuth = function(req, res, next) {
 
@@ -11,7 +12,7 @@ exports.ensureAuth = function(req, res, next) {
   let token = req.headers.game_authorization.replace(/['"]+/g, '');
 
   try {
-    var payload = jwt.decode(token, process.env.TOKENIZATION_SECRET);
+    var payload = jwt.decode(token, config.TOKENIZATION_SECRET);
   } catch(ex){
     return res.status(404).send({message: "El token de autenticación no es valido."});
   }

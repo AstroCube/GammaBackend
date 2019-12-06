@@ -2,7 +2,8 @@
 
 const jwt_tokenization = require("jwt-simple");
 const moment = require("moment");
-const secret = process.env.TOKENIZATION_SECRET;
+const config = require("../config");
+const secret = config.TOKENIZATION_SECRET;
 
 exports.createToken = function(user, persistence) {
   let payload = {

@@ -1,14 +1,15 @@
 "use strict";
 
 const node_mailer = require("nodemailer");
+const config = require("../config.json");
 
 let smtp_transport = node_mailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: process.env.SMTP_SECURE,
+  host: config.SMTP_HOST,
+  port: config.SMTP_PORT,
+  secure: config.SMTP_SECURE,
   auth: {
-    user: process.env.SMTP_AUTH_USER,
-    pass: process.env.SMTP_AUTH_PASSWORD
+    user: config.SMTP_AUTH_USER,
+    pass: config.SMTP_AUTH_PASSWORD
   }
 });
 

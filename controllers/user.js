@@ -9,6 +9,7 @@ const mailer = require("@smtp_service");
 const moment = require("moment");
 const mongoose = require("mongoose");
 const Promise = require ("bluebird");
+const config = require("../config");
 const redis = require("@redis_service");
 const User = require("@user");
 
@@ -207,8 +208,8 @@ module.exports = {
     User.find().select("_id username skin").exec((err, users) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener la lista de usuarios."});
       let fixedUsers = users.filter((username) => {
-        if (req.params.own) return username._id.toString() !== process.env.GUEST_USER;
-        return username._id.toString() !== process.env.GUEST_USER && username._id.toString() !== req.user.sub;
+        if (req.params.own) return username._id.toString() !== config.GUEST_USER;
+        return username._id.toString() !== config.GUEST_USER && username._id.toString() !== req.user.sub;
       });
       return res.status(200).send(fixedUsers);
     });

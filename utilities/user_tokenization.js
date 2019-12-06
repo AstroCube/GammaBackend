@@ -1,7 +1,8 @@
 "use strict";
 
 const jwt_tokenization = require("jwt-simple");
-const secret = process.env.TOKENIZATION_SECRET;
+const config = require("../config");
+const secret = config.TOKENIZATION_SECRET;
 const moment = require("moment");
 
 exports.createToken = function(user) {

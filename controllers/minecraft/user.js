@@ -10,6 +10,7 @@ const moment = require("moment");
 const Promise = require ("bluebird");
 const Punishment = require("@punishment");
 const redis = require("@redis_service");
+const config = require("../../config");
 const User = require("@user");
 const user_tokenization = require("@user_tokenization");
 const Validator = require('mongoose').Types.ObjectId;
@@ -83,7 +84,7 @@ module.exports = {
             user.member_since = Date;
             user.logged = "authenticating";
             user.group.push({
-              _id: process.env.DEFAULT_GROUP,
+              _id: config.DEFAULT_GROUP,
               add_date: Date
             });
             user.save((err, saved_user) => {
@@ -206,7 +207,7 @@ module.exports = {
             redis.redisClient.del(decodedMail, (err, remove) => {
               if (err) return res.status(500).send({message: "redis_error"});
               if (remove !== 1) return res.status(500).send({message: "redis_issue"});
-              return res.redirect("http://" + process.env.BACKEND_URL + "/login?verified=true");
+              return res.redirect("http://" + config.BACKEND_URL + "/login?verified=true");
             });
           }
         });
