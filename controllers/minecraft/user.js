@@ -207,7 +207,7 @@ module.exports = {
             redis.redisClient.del(decodedMail, (err, remove) => {
               if (err) return res.status(500).send({message: "redis_error"});
               if (remove !== 1) return res.status(500).send({message: "redis_issue"});
-              return res.redirect("http://" + config.BACKEND_URL + "/login?verified=true");
+              return res.redirect(config.FRONTEND_URL + "/login?verified=true");
             });
           }
         });
