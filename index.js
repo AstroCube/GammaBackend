@@ -12,13 +12,13 @@ mongoose.connect(config.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: 
   .then(() => {
     console.log("[SEOCRAFT API] Se ha hecho una conexión exitosa con la base de datos.");
     app.listen(5001, backend, () => {
-      console.log("[SEOCRAFT API] La API actualmente se encuentra escuchando en http://" + config.BACKEND_URL + ":" + 5001);
+      console.log("[SEOCRAFT API] La API actualmente se encuentra escuchando en " + backend + ":" + 5001);
     });
     app.listen(5002, backend, () => {
-        console.log("[SEOCRAFT API] La API actualmente se encuentra escuchando en http://" + config.BACKEND_URL + ":" + 5002);
+        console.log("[SEOCRAFT API] La API actualmente se encuentra escuchando en " + backend + ":" + 5002);
     });
     app.listen(5003, backend, () => {
-        console.log("[SEOCRAFT API] La API actualmente se encuentra escuchando en http://" + config.BACKEND_URL + ":" + 5003);
+        console.log("[SEOCRAFT API] La API actualmente se encuentra escuchando en " + backend + ":" + 5003);
     });
   })
   .catch( err => {
