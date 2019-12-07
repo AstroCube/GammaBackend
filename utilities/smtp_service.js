@@ -18,7 +18,7 @@ exports.sendMail = async function(to, subject, html) {
   try {
     let mailOptions = {
       to: to,
-      from: "ianfe@martinastore.com.co",
+      from: config.SMTP_AUTH_USER,
       subject: subject,
       html: html
     };
