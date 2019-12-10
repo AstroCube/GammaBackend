@@ -108,19 +108,15 @@ module.exports = {
   },
 
   server_register: function(req, res) {
-    let params = req.body;
-    let ip;
+    const params = req.body;
+    let ip = "Unknown";
     if (params.username && params.ip && params.password) {
-      if (geoip.lookup(params.ip) != null) {
-        ip = geoip.lookup(params.ip).country;
-      } else {
-        ip = "Unknown";
-      }
+      if (geoip.lookup(params.ip) != null) ip = geoip.lookup(params.ip).country;
       bcrypt.hash(params.password, null, null, (err, hash) => {
         if (err || !hash) res.status(500).send({message: "Error while registering user."});
-        User.findOneAndUpdate({username_lowercase: params.username.toLowerCase()}, {$set: {password: hash, logged: "true"}, $push: {used_ips: {number: params.ip, country: ip.country, primary: true}}}, (err, user_updated) => {
-          if (err || !user_updated) res.status(500).send({message: "Error while registering user."});
-          return res.status(200).send({token: user_tokenization.createToken(user_updated)});
+        User.findOneAndUpdate({username_lowercase: params.username.toLowerCase()}, {$set: {password: hash, logged: "true"}, $push: {used_ips: {number: params.ip, country: ip.country, primary: true}}}, (err, userUpdated) => {
+          if (err || !userUpdated) res.status(500).send({message: "Error while registering user."});
+          return res.status(200).send({token: user_tokenization.createToken(userUpdated)});
         });
       });
     } else {
@@ -129,16 +125,23 @@ module.exports = {
   },
 
   server_login: function(req, res) {
-    let params = req.body;
-    if (params.password && params.username) {
+    const params = req.body;
+    if (params.password && params.username && params.ip) {
       User.findOne({username_lowercase: params.username.toLowerCase()}, (err, user) => {
-        if (err) res.status(500).send({message: "Ha ocurrido un error al validar la contraseña del usuario."});
+        if (err || !user) return res.status(500).send({message: "Ha ocurrido un error al validar la contraseña del usuario."});
         bcrypt.compare(params.password, user.password, (err, check) => {
           if (check) {
             user.logged = "true";
             user.save((err, saved) => {
               if (err || !saved) return res.status(400).send({message: "Invalid password."});
-              return res.status(200).send({last_game: user.last_game, token: user_tokenization.createToken(saved)});
+              if (user.used_ips.some(e => e.number !== params.ip)) {
+                User.findByIdAndUpdate(user._id, {$push: {used_ips: {number: params.ip, country: params.ip.country, primary: false}}}, (err, updatedUser) => {
+                  if (err || !updatedUser) return res.status(500).send({message: "Ha ocurrido un error al validar la contraseña del usuario."});
+                  return res.status(200).send({logged: true});
+                });
+              } else {
+                return res.status(200).send({logged: true});
+              }
             });
           } else {
             return res.status(403).send({message: "Invalid password."});
