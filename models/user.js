@@ -55,7 +55,10 @@ let UserSchema = Schema({
   }],
   // -- Customizable fields -- //
   language: { type: String, enum: ['es', 'en', 'fr'], default: "es"},
-  gender: String,
+  gender: {
+    type: Number,
+    default: 0
+  },
   occupation: String,
   location: String,
   interests: String,

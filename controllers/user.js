@@ -25,7 +25,7 @@ module.exports = {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al iniciar sesión."});
       if(user) {
         bcrypt.compare(req.body.password, user.password, (err, check) => {
-          if(check) {
+          if (check) {
             return res.status(200).send({token: jwt.createToken(user, req.body.persistence)});
           } else {
             return res.status(404).send({message: "Ha ocurrido un error al procesar tu contraseña."});
@@ -77,7 +77,6 @@ module.exports = {
       if (user._id.toString() === process.env.GUEST_USER && !own) return res.status(400);
 
       delete user.password;
-      delete user.email;
       delete user.discord;
 
       return res.status(200).send({user});
