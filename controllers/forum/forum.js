@@ -15,6 +15,7 @@ module.exports = {
       let forum = new Forum();
       forum.name = req.body.name;
       forum.order = req.body.order;
+      forum.description = req.body.description;
       forum.category = req.body.category;
       if (req.body.parent) forum.parent = req.body.parent;
       forum.save((err, created_forum) => {
