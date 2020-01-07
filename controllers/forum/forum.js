@@ -522,8 +522,8 @@ module.exports = {
         let fixed_category = {};
         fixed_category.name = category.name;
         fixed_category.order = category.order;
-        fixed_category.forums = await Forum.find({category: category._id, parent: {$exists: false}}).exec().then((forums) => {
-          return Promise.map(forums, async (forum) => {
+        fixed_category.forums = await Forum.find({category: category._id, parent: {$exists: false}}).exec().then(async (forums) => {
+          return await Promise.map(forums, async (forum) => {
             let description; if (forum.description) description = forum.description;
             let can_view = await AF.local_permission(req.user.sub, "web_permissions.forum.manage").then(async (global) => {
               if (global) {
