@@ -621,6 +621,7 @@ module.exports = {
         }).catch((err) => {
           console.log(err);
         });
+        fixed_category.forums = fixed_category.forums.filter((forum) => forum !== null);
         return fixed_category;
       });
       return res.status(200).send({categories: fixed_categories.filter((category) => category.forums && category.forums.length >= 1)});
