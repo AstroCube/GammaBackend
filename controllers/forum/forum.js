@@ -621,10 +621,9 @@ module.exports = {
         }).catch((err) => {
           console.log(err);
         });
-        if (fixed_category.forums.indexOf() !== -1) return;
         return fixed_category;
       });
-      return res.status(200).send({categories: fixed_categories.filter(() => fixed_categories.forums.length < 1)});
+      return res.status(200).send({categories: fixed_categories.filter((category) => category.forums && category.forums.length >= 1)});
     });
   }
 
