@@ -621,7 +621,7 @@ module.exports = {
         }).catch((err) => {
           console.log(err);
         });
-        if (fixed_category.forums.indexOf() !== -1) return;
+        if (fixed_category.forums.length < 1) return;
         return fixed_category;
       });
       return res.status(200).send({categories: fixed_categories});
