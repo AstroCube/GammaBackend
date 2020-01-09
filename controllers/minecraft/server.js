@@ -10,7 +10,7 @@ module.exports = {
 
   loadServer: function(req, res) {
     let params = req.body;
-    if (params.slug && params.type && params.cluster && params.maxPlayers) {
+    if (params.slug && params.type && params.cluster) {
       Cluster.findOne({_id: params.cluster}, (err, cluster) => {
         if (!cluster) return res.status(403).send({message: "El cluster al que se intenta iniciar no es válido."});
         let server = new Server();
