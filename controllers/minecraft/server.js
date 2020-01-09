@@ -23,7 +23,6 @@ module.exports = {
         server.max_running = params.max_running;
         server.max_total = params.max_total;
         server.players = [];
-        server.maxPlayers = params.maxPlayers;
         server.matches = [];
         server.save((err, server) => {
           if (err || !server) return res.status(500).send({message: "Ha ocurrido un error al iniciar el servidor."});

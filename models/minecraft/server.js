@@ -18,7 +18,6 @@ let ServerSchema = Schema({
     type: Schema.ObjectId,
     ref: 'User',
   }],
-  maxPlayers: Number,
   cluster: {
     type: Schema.ObjectId,
     ref: 'Cluster'
