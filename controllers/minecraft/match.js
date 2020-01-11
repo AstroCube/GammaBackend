@@ -112,7 +112,7 @@ module.exports = {
   userWonMatches: function(req, res) {
     const params = req.body;
     if (params.gamemode && params.subGamemode && params.user) {
-      Match.find({gamemde: params.gamemode, subGamemode: params.subGamemode, winner: user}, (err, matches) => {
+      Match.find({gamemde: params.gamemode, subGamemode: params.subGamemode, winner: params.user}, (err, matches) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener las pertidas."});
         return res.status(200).send(matches);
       });
