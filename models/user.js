@@ -29,6 +29,7 @@ let UserSchema = Schema({
     country: String,
     primary: Boolean
   }],
+  premium: {type: Boolean, default: false},
   discord: {
     id: String,
     accessToken: String,
