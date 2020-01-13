@@ -71,6 +71,8 @@ let UserSchema = Schema({
   about: String,
   // -- Settings fields -- //
   ac_active: {type: Boolean, default: false},
+  ac_logs: {type: Boolean, default: false},
+  ac_punishments: {type: Boolean, default: false},
   subscribe_topics: { type: Boolean, default: false },
   alert_quoted: { type: Boolean, default: false },
   accept_gifts: { type: Boolean, default: false },
