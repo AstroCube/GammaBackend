@@ -13,7 +13,7 @@ let StatsSchema = Schema({
     crowns: { type: Number, default: 0 },
     experience: { type: Number, default: 0 },
     helmet: {
-      material: String,
+      material: Number,
       te: [
         {
           enchantment: String,
@@ -28,7 +28,7 @@ let StatsSchema = Schema({
       ]
     },
     chestplate: {
-      material: String,
+      material: Number,
       te: [
         {
           enchantment: String,
@@ -43,7 +43,7 @@ let StatsSchema = Schema({
       ]
     },
     leggings: {
-      material: String,
+      material: Number,
       te: [
         {
           enchantment: String,
@@ -58,7 +58,7 @@ let StatsSchema = Schema({
       ]
     },
     boots: {
-      material: String,
+      material: Number,
       te: [
         {
           enchantment: String,
@@ -73,7 +73,7 @@ let StatsSchema = Schema({
       ]
     },
     sword: {
-      material: String,
+      material: Number,
       te: [
         {
           enchantment: String,
@@ -88,7 +88,7 @@ let StatsSchema = Schema({
       ]
     },
     bow: {
-      material: String,
+      material: Number,
       te: [
         {
           enchantment: String,
