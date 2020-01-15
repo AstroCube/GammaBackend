@@ -12,12 +12,60 @@ let StatsSchema = Schema({
     squamas: { type: Number, default: 0 },
     crowns: { type: Number, default: 0 },
     experience: { type: Number, default: 0 },
-    helmet: Schema.Types.Mixed,
-    chestplate: Schema.Types.Mixed,
-    leggings: Schema.Types.Mixed,
-    boots: Schema.Types.Mixed,
-    sword: Schema.Types.Mixed,
-    bow: Schema.Types.Mixed
+    helmet: {
+      material: String,
+      te: [
+          Schema.Types.Mixed
+      ],
+      pe: [
+          Schema.Types.Mixed
+      ]
+    },
+    chestplate: {
+      material: String,
+      te: [
+        Schema.Types.Mixed
+      ],
+      pe: [
+        Schema.Types.Mixed
+      ]
+    },
+    leggings: {
+      material: String,
+      te: [
+        Schema.Types.Mixed
+      ],
+      pe: [
+        Schema.Types.Mixed
+      ]
+    },
+    boots: {
+      material: String,
+      te: [
+        Schema.Types.Mixed
+      ],
+      pe: [
+        Schema.Types.Mixed
+      ]
+    },
+    sword: {
+      material: String,
+      te: [
+        Schema.Types.Mixed
+      ],
+      pe: [
+        Schema.Types.Mixed
+      ]
+    },
+    bow: {
+      material: String,
+      te: [
+        Schema.Types.Mixed
+      ],
+      pe: [
+        Schema.Types.Mixed
+      ]
+    }
   },
   skyWars: {
     kills: { type: Number, default: 0 },
