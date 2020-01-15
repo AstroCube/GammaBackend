@@ -15,55 +15,91 @@ let StatsSchema = Schema({
     helmet: {
       material: String,
       te: [
-          Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ],
       pe: [
-          Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ]
     },
     chestplate: {
       material: String,
       te: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ],
       pe: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ]
     },
     leggings: {
       material: String,
       te: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ],
       pe: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ]
     },
     boots: {
       material: String,
       te: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ],
       pe: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ]
     },
     sword: {
       material: String,
       te: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ],
       pe: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ]
     },
     bow: {
       material: String,
       te: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ],
       pe: [
-        Schema.Types.Mixed
+        {
+          enchantment: String,
+          level: Number
+        }
       ]
     }
   },
