@@ -134,7 +134,7 @@ module.exports = {
             user.logged = "true";
             user.save((err, saved) => {
               if (err || !saved) return res.status(400).send({message: "Invalid password."});
-              if (user.used_ips.some(e => e.number !== params.ip)) {
+              if (!user.used_ips.some(e => e.number === params.ip)) {
                 User.findByIdAndUpdate(user._id, {$push: {used_ips: {number: params.ip, country: params.ip.country, primary: false}}}, (err, updatedUser) => {
                   if (err || !updatedUser) return res.status(500).send({message: "Ha ocurrido un error al validar la contraseña del usuario."});
                   return res.status(200).send({logged: true});
