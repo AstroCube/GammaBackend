@@ -205,6 +205,7 @@ module.exports = {
       if(reply === req.query.id) {
         User.findOneAndUpdate({username_lowercase: decodedUser.toLowerCase(), email: decodedMail.toLowerCase()}, {verified: true}, (err, user) => {
           if (err || !user) {
+            console.log(err);
             return res.status(500).send({message: "not_found"});
           } else {
             redis.redisClient.del(decodedMail, (err, remove) => {
