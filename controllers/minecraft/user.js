@@ -205,12 +205,11 @@ module.exports = {
       if(reply === req.query.id) {
         User.findOneAndUpdate({username_lowercase: decodedUser.toLowerCase(), email: decodedMail.toLowerCase()}, {verified: true}, (err, user) => {
           if (err || !user) {
-            console.log(err);
-            return res.status(500).send({message: "not_found"});
+            return res.redirect(config.FRONTEND_URL + "/login?verified=false");
           } else {
             redis.redisClient.del(decodedMail, (err, remove) => {
-              if (err) return res.status(500).send({message: "redis_error"});
-              if (remove !== 1) return res.status(500).send({message: "redis_issue"});
+              if (err) return res.redirect(config.FRONTEND_URL + "/login?verified=false");
+              if (remove !== 1) return res.redirect(config.FRONTEND_URL + "/login?verified=false");
               return res.redirect(config.FRONTEND_URL + "/login?verified=true");
             });
           }
