@@ -8,7 +8,6 @@ const Group = require("@group");
 const mailer = require("@smtp_service");
 const moment = require("moment");
 const Promise = require ("bluebird");
-const Punishment = require("@punishment");
 const redis = require("@redis_service");
 const config = require("../../config");
 const User = require("@user");

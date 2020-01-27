@@ -2,7 +2,6 @@
 
 const AF = require("@auxiliar_functions");
 const bcrypt = require("bcrypt-nodejs");
-const Friend = require("@friend");
 const Group = require("@group");
 const jwt = require("@jwt_tokenization");
 const mailer = require("@smtp_service");
