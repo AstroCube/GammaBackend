@@ -76,7 +76,9 @@ module.exports = {
       if (user._id.toString() === process.env.GUEST_USER && !own) return res.status(400);
 
       delete user.password;
-      delete user.discord;
+      delete user.discord.accessToken;
+      delete user.discord.refreshToken;
+      delete user.discord.tokenTimestamp;
 
       return res.status(200).send({user});
     });
