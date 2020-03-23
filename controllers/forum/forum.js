@@ -5,6 +5,7 @@ const Category = require("@category");
 const Forum = require("@forum");
 const Topic = require("@topic");
 const Pagination = require("@pagination_service");
+const config = require("../config");
 const Post = require("@post");
 const Promise = require("bluebird");
 
@@ -47,6 +48,7 @@ module.exports = {
             actual: {_id: forum._id, name: forum.name, description: forum.description}
           },
           permissions: {
+            guest: req.user.sub === config.GUEST_USER,
             create: false,
             view: "none",
             edit: "none",
