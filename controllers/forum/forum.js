@@ -538,8 +538,6 @@ module.exports = {
                         return true;
                       } else {
                         return await AF.dynamic_permission(req.user.sub, "web_permissions.forum." + forum._id + ".view", "own").then((own) => {
-                          console.log(req.user.sub);
-                          console.log(own);
                           if (own) return true;
                         }).catch((err) => {
                           console.log(err);
