@@ -156,6 +156,7 @@ module.exports = {
     User.findOneAndUpdate({_id: req.user.sub}, {last_seen: moment().unix(), logged: "false"}, {new: true}, (err, user_updated)  => {
       if (!user_updated) return res.status(500).send({message: "Petición de desconexión incorrecta."});
       if (err) res.status(500).send({message: "Ha ocurrido un error desconectar al usuario de la base de datos."});
+      console.log(user_updated);
       return res.status(200).send({user: user_updated.username, disconnected: user_updated.last_seen});
     });
   },
