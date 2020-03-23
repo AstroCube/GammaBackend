@@ -5,7 +5,7 @@ const Category = require("@category");
 const Forum = require("@forum");
 const Topic = require("@topic");
 const Pagination = require("@pagination_service");
-const config = require("../config");
+const config = require("../../config");
 const Post = require("@post");
 const Promise = require("bluebird");
 
