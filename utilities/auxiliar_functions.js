@@ -411,7 +411,6 @@ module.exports = {
   file_unlink,
   dynamic_permission,
   inside_group,
-  friend_create,
   stats_create,
   user_groups_id,
   server_placeholder,
