@@ -17,11 +17,11 @@ module.exports = {
 
         if (user.group.some(e => e._id.toString() === params.group.toString())) return res.status(400).send({message: "El usuario ya se encuentra en el grupo"});
 
-        user.group.push(
+        user.groups.push(
             {
-              _id: params.group,
-              add_date: moment().unix(),
-              role_comment: params.comment
+              group: params.group,
+              joined: moment().unix(),
+              comment: params.comment
             }
         );
 
@@ -44,9 +44,9 @@ module.exports = {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener al usuario."});
         if (!user) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
 
-        if (!user.group.some(e => e._id.toString() === params.group.toString())) return res.status(400).send({message: "El usuario no se encuentra dentro del grupo."});
+        if (!user.group.some(e => e.group.toString() === params.group.toString())) return res.status(400).send({message: "El usuario no se encuentra dentro del grupo."});
 
-        user.group = user.group.filter((group) => group._id.toString() !== params.group.toString());
+        user.group = user.group.filter((group) => group.group.toString() !== params.group.toString());
         user.save((err, updatedUser) => {
           if (err || !updatedUser) return res.status(500).send({message: "Ha ocurrido un error al actualizar el usuario."});
           return res.status(200).send(updatedUser);
@@ -100,7 +100,7 @@ module.exports = {
       if (!group) return res.status(404).send({message: "No se ha encontrado el grupo."});
       if (!group.staff) return res.status(403).send({message: "El grupo no es marcado como staff."});
 
-      User.find({"group._id": req.params.id}).select("_id username group last_seen twitter public_email").exec((err, users) => {
+      User.find({"groups.group": req.params.id}).select("_id username group last_seen twitter public_email").exec((err, users) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener los grupos."});
         return res.status(200).send(users);
       });

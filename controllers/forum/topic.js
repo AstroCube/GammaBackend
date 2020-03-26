@@ -224,7 +224,7 @@ module.exports = {
           if (err || !saved_post) return res.status(500).send({message: "Ha ocurrido un error al responder este tema."});
           User.findOne({_id: req.user.sub}, async (err, poster) => {
             if (err || !poster) return res.status(500).send({message: "Ha ocurrido un error al responder este tema."});
-            if (poster.subscribe_topics) {
+            if (poster.settings.forum.subscribe) {
               await Topic.findOne({_id: req.body.topic, subscribers: req.user.sub}).exec().then((topic_tagged) => {
                 if (!topic_tagged) {
                   Topic.findOneAndUpdate({_id: req.body.topic}, {$push: {subscribers: req.user.sub}}).exec().then(() => {
@@ -246,7 +246,7 @@ module.exports = {
               });
               User.findOne({_id: alert.user}, (err, user) => {
                 if (err || !user) return res.status(500).send({message: "Ha ocurrido un error al responder este tema."});
-                if (user.alert_quoted && user._id.toString() !== req.user.sub.toString()) {
+                if (user.settings.forum.quoteAlert && user._id.toString() !== req.user.sub.toString()) {
                   alert.type = "forum_quote";
                   alert.related = req.body.topic;
                   alert.second_user = req.user.sub;

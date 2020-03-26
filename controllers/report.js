@@ -12,7 +12,7 @@ module.exports = {
 
   report_pre_create: function(req, res) {
     try {
-      User.findOne({username_lowercase: req.body.username.toLowerCase()}, async (err, username) => {
+      User.findOne({username: req.body.username.toLowerCase()}, async (err, username) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el usuario."});
         if (!username) return res.status(200).send({found: false});
         let placeholder = await AF.user_placeholder(username._id).then((placeholder) => { return placeholder; }).catch((err) => console.log(err));

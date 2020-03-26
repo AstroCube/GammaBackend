@@ -18,11 +18,9 @@ async function syncRoles(id) {
     });
   });
 
-  let userGroups = await User.find({_id : id}).exec().then(async (groups) => {
-    return await Promise.map(groups[0].group, async (groups) => {
-      return await Group.findOne({_id : groups._id}).then((group) => {
-        return group.discord_role;
-      });
+  let userGroups = await User.findOne({_id : id}).exec().then(async (groups) => {
+    return await Promise.map(groups.groups, async (groups) => {
+      return groups.group.discord_role;
     });
   });
   removeRoles = removeRoles.filter((f) => !userGroups.includes(f));
@@ -48,7 +46,7 @@ async function discordUserFetch(id) {
 
   return await User.findOne({_id: id}).exec().then(async (user) => {
 
-    if (moment().unix() > moment.unix(user.tokenTimestamp).add(7, 'days').unix()) {
+    if (moment().unix() > moment.unix(user.stamp).add(7, 'days').unix()) {
       let formData = new URLSearchParams();
       formData.append("client_id", config.DISCORD_CLIENT_ID);
       formData.append("client_secret", config.DISCORD_CLIENT_SECRET);
@@ -65,8 +63,8 @@ async function discordUserFetch(id) {
 
       const json = await response.json();
 
-      user.discord.accessToken = json.access_token;
-      user.discord.tokenTimestamp = moment().unix();
+      user.discord.access = json.access_token;
+      user.discord.stamp = moment().unix();
 
       // --- Will update user record and re-fetch information --- //
       return await user.save().then(async (updated) => {
@@ -74,7 +72,7 @@ async function discordUserFetch(id) {
             {
               method: 'GET',
               headers: {
-                Authorization: "Bearer " + updated.discord.accessToken,
+                Authorization: "Bearer " + updated.discord.access,
               }
             });
         return await response.json();
@@ -86,7 +84,7 @@ async function discordUserFetch(id) {
           {
             method: 'GET',
             headers: {
-              Authorization: "Bearer " + user.discord.accessToken,
+              Authorization: "Bearer " + user.discord.access,
             }
           });
       return await response.json();
@@ -132,7 +130,7 @@ module.exports = {
             if (!user) message.author.send(":no_entry_sign: ¡Tu cuenta no se encuentra sincronizada con ninguna cuenta *Minecraft*! :no_entry_sign:");
             if (user) {
               await syncRoles(user._id).then(() => {
-                return message.author.send(":arrows_counterclockwise: ¡" + message.author + ", ahora tus rangos de _Discord_ están nuevamente sincronizados con los de tu cuenta _Minecraft_ *" + user.username + "*! :arrows_counterclockwise:");
+                return message.author.send(":arrows_counterclockwise: ¡" + message.author + ", ahora tus rangos de _Discord_ están nuevamente sincronizados con los de tu cuenta _Minecraft_ *" + user.display + "*! :arrows_counterclockwise:");
               }).catch(() => { message.author.send(":no_entry_sign: ¡Ha ocurrido un error al sincronizar tus rangos! :no_entry_sign:"); });
             }
           });
@@ -173,9 +171,9 @@ module.exports = {
 
       User.findOneAndUpdate({_id: req.query.state}, {
         discord: {
-          accessToken: json.access_token,
-          refreshToken: json.refresh_token,
-          tokenTimestamp: moment().unix()
+          access: json.access_token,
+          refresh: json.refresh_token,
+          stamp: moment().unix()
         }}, {new: true}, (err, updatedUser) => {
 
         if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
@@ -189,16 +187,16 @@ module.exports = {
                 {
                   discord: {
                     id: userData.id,
-                    accessToken: updatedUser.discord.accessToken,
-                    refreshToken: updatedUser.discord.refreshToken,
-                    tokenTimestamp: updatedUser.discord.tokenTimestamp
+                    access: updatedUser.discord.access,
+                    refresh: updatedUser.discord.refresh,
+                    stamp: updatedUser.discord.stamp
                   }
                 }, {new: true}, async (err, updatedDiscord) => {
 
               if (err) return res.status(500).send({message: "Ha ocurrido un error al sincronizar tu cuenta de discord."});
               if (!updatedDiscord) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
 
-              user.send(":white_check_mark:  ¡"+ user +", has sincronizado correctamente tu cuenta con el usuario *" + userData.username + "*! :white_check_mark:\n" +
+              user.send(":white_check_mark:  ¡"+ user +", has sincronizado correctamente tu cuenta con el usuario *" + userData.display + "*! :white_check_mark:\n" +
                   "\n" +
                   "Recuerda que ahora obtendrás una recompensa IN-Game, en cualquiera de los lobbies puedes dar doble click sobre la sección *Mi Perfil* y luego la sección *Recompensas* para redimirla, recuerda que esto no funciona si ya has añadido anteriormente una cuenta de _Discord_.");
 

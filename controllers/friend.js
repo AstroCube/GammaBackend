@@ -1,10 +1,7 @@
 "use strict";
 
-const AF = require("@auxiliar_functions");
 const Friend = require("@friend");
 const Promise = require("bluebird");
-const User = require("@user");
-const Pagination = require("@pagination_service");
 
 module.exports = {
 

@@ -64,7 +64,7 @@ module.exports = {
     if (mongoose.Types.ObjectId.isValid(req.params.user)) {
       query = {_id: req.params.user};
     } else if (req.params.user) {
-      query = {username_lowercase: req.params.user.toLowerCase()};
+      query = {username: req.params.user.toLowerCase()};
     } else {
       query = {_id: req.user.sub};
       own = true;
@@ -76,9 +76,9 @@ module.exports = {
       if (user._id.toString() === process.env.GUEST_USER && !own) return res.status(400);
 
       delete user.password;
-      delete user.discord.accessToken;
-      delete user.discord.refreshToken;
-      delete user.discord.tokenTimestamp;
+      delete user.discord.access;
+      delete user.discord.refresh;
+      delete user.discord.stamp;
 
       return res.status(200).send({user});
     });
@@ -115,7 +115,7 @@ module.exports = {
         id: user._id,
         username: user.username,
         userColor: badges[0].html_color,
-        lastSeen: user.last_seen,
+        lastSeen: user.session.lastSeen,
         skin: user.skin,
         badges: badges
       });
@@ -165,7 +165,7 @@ module.exports = {
   email_verification: function(req, res) {
     User.findOne({_id: req.params.id}, (err, user) => {
       if (!user || err) return res.status(500).send({message: "Ha ocurrido un error al enviar el correo de verificación."});
-      redis.redisClient.exists("verification_" + user.username_lowercase, (err, reply) => {
+      redis.redisClient.exists("verification_" + user.username, (err, reply) => {
         if (reply) return res.status(400).send({message: "¡Ya se ha enviado anteriormente un correo de verificación!"});
         if (err) return res.status(500).send({message: "Ha ocurrido un error al enviar el correo de verificación."});
         let random = Math.floor(Math.pow(10, 6-1) + Math.random() * (Math.pow(6, 6) - Math.pow(6, 6-1) - 1));
@@ -173,8 +173,8 @@ module.exports = {
           "<!DOCTYPE html><html lang=\"en\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"><head style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> <meta charset=\"UTF-8\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> <link href=\"https://fonts.googleapis.com/css?family=Montserrat:400,700,900\" rel=\"stylesheet\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> <style style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> *, *::before, *::after { margin: 0; padding: 0; box-sizing: inherit; -webkit-font-smoothing: antialiased; } body { box-sizing: border-box; background-color: #050404; width: 700px; padding: 20px; margin: auto; } .header { padding-bottom: 10px; } .logo { display: inline-block; width: 100px; } .main { border-top: 3px solid #f68657; background-color: #1f2124; width: 100%; padding: 30px 20px; } .heading { font-weight: 600; letter-spacing: -1px; font-family: \"Montserrat\", sans-serif; text-transform: uppercase; color: #ffffff; } .info { margin: 30px auto; width: 60%; font-family: \"Open Sans\", sans-serif; font-size: 15px; color: #ffffff; } .info span { font-weight: 600; letter-spacing: -1px; font-family: \"Montserrat\", sans-serif; text-transform: uppercase; color: #f6b352; } .copyright { display: inline-block; margin: 20px; color: #ffffff; font-family: \"Open Sans\", sans-serif; font-size: 14px; } .verification { font-weight: 600; letter-spacing: 20px; font-size: 40px; font-family: \"Montserrat\", sans-serif; text-transform: uppercase; color: #ffffff; } </style></head><body style=\"margin: auto;padding: 20px;box-sizing: border-box;-webkit-font-smoothing: antialiased;background-color: #050404;width: 700px;\"><table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> <tr style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> <td align=\"center\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> <div class=\"header\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;padding-bottom: 10px;\"> <img src=\"https://i.imgur.com/yEF1fBd.png\" alt=\"Seocraft Logo\" class=\"logo\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;display: inline-block;width: 100px;\"> </div> <div class=\"main\" style=\"margin: 0;padding: 30px 20px;box-sizing: inherit;-webkit-font-smoothing: antialiased;border-top: 3px solid #f68657;background-color: #1f2124;width: 100%;\"> <h1 class=\"heading\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;font-weight: 600;letter-spacing: -1px;font-family: &quot;Montserrat&quot;, sans-serif;text-transform: uppercase;color: #ffffff;\">Actualiza tu correo</h1> <p class=\"info\" style=\"margin: 30px auto;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;width: 60%;font-family: &quot;Open Sans&quot;, sans-serif;font-size: 15px;color: #ffffff;\">Hola <span style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;font-weight: 600;letter-spacing: -1px;font-family: &quot;Montserrat&quot;, sans-serif;text-transform: uppercase;color: #f6b352;\">" + user.username + "</span>, haz recibido el código que solicitaste para actualizar el correo electrónico en tu sección <strong style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\">Ajústes de Cuenta</strong>. Simplemente ingresa tu nuevo correo electrónico y el código de abajo, si no pediste este código simplemente puedes hacer caso omiso a este correo electrónico.</p> <span class=\"verification\" style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;font-weight: 600;letter-spacing: 20px;font-size: 40px;font-family: &quot;Montserrat&quot;, sans-serif;text-transform: uppercase;color: #ffffff;\">" + random + "</span> </div> <div style=\"margin: 0;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;\"> <p class=\"copyright\" style=\"margin: 20px;padding: 0;box-sizing: inherit;-webkit-font-smoothing: antialiased;display: inline-block;color: #ffffff;font-family: &quot;Open Sans&quot;, sans-serif;font-size: 14px;\">&copy; Seocraft Network 2019. Todos los derechos reservados a Seocraft Network S.A</p> </div> </td> </tr></table></body></html>"
         ).then((email) => {
           if (!email) return res.status(500).send({message: "Ha ocurrido un error al enviar el correo de verificación."});
-          redis.redisClient.set("verification_" + user.username_lowercase, random);
-          redis.redisClient.expire("verification_" + user.username_lowercase, 600);
+          redis.redisClient.set("verification_" + user.username, random);
+          redis.redisClient.expire("verification_" + user.username, 600);
           if (err) return res.status(500).send({message: "Ha ocurrido un error al enviar el correo de verificación."});
           return res.status(200).send({email_sent: true});
         });
@@ -185,7 +185,7 @@ module.exports = {
   email_update: function(req, res) {
     User.findOne({_id: req.user.sub}, (err, user) => {
       if (!user || err) return res.status(500).send({message: "Ha ocurrido un error al actualizar tu correo electrónico."});
-      redis.redisClient.get("verification_" + user.username_lowercase, (err, reply) => {
+      redis.redisClient.get("verification_" + user.username, (err, reply) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al actualizar tu correo electrónico."});
         if (reply !== req.body.verification) {
           return res.status(404).send({message: "El código de verificación ingresado es inválido."});
@@ -193,7 +193,7 @@ module.exports = {
           user.email = req.body.email;
           user.save((err, save) => {
             if (err || !save) return res.status(500).send({message: "Ha ocurrido un error al actualizar tu correo electrónico."});
-            redis.redisClient.del("verification_" + user.username_lowercase, (err, remove) => {
+            redis.redisClient.del("verification_" + user.username, (err, remove) => {
               if (err) return res.status(500).send({message: "Ha ocurrido un error al actualizar tu correo electrónico."});
               if (remove !== 1) return res.status(500).send({message: "Ha ocurrido un error al actualizar tu correo electrónico."});
               return res.status(200).send({updated: true});

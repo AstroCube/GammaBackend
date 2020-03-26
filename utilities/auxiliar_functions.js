@@ -23,8 +23,8 @@ function fixId(object) {
 async function local_permission(user, permission) {
   try {
     let user_groups = await user_groups_id(user).then(async (groups) => {
-      return await Promise.map(groups[0].group, (ids) => {
-        return ids._id;
+      return await Promise.map(groups.groups, (ids) => {
+        return ids.group._id;
       });
     }).catch((err) => {
       console.log(err);
@@ -46,8 +46,8 @@ async function file_unlink(path) {
 async function dynamic_permission(user, permission, text) {
   try {
     let user_groups = await user_groups_id(user).then(async (groups) => {
-      return await Promise.map(groups[0].group, (ids) => {
-        return ids._id;
+      return await Promise.map(groups.groups, (ids) => {
+        return ids.group._id;
       });
     }).catch((err) => {
       console.log(err);
@@ -65,12 +65,8 @@ async function dynamic_permission(user, permission, text) {
 async function user_placeholder(user_id) {
   try {
     return await user_groups_id(user_id).then(async (userGroups) => {
-      let groupBadges = await Promise.map(userGroups[0].group, async (groups) => {
-        return await Group.findOne({"_id" : groups._id}).select({"name": 1, "priority": 1, "badge_color": 1, "html_color": 1, "badge_link": 1, "_id": 0, "last_seen": 1}).exec().then((group) => {
-          return group;
-        }).catch((err) => {
-          console.log(err);
-        });
+      let groupBadges = await Promise.map(userGroups.groups, async (groups) => {
+        return await groups.group;
       });
       groupBadges.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
       let username = await User.findOne({"_id": user_id}).exec().then((username) => {
@@ -80,9 +76,9 @@ async function user_placeholder(user_id) {
       });
       return {
         id: username._id,
-        username: username.username,
+        username: username.display,
         user_color: groupBadges[0].html_color,
-        last_seen: username.last_seen,
+        last_seen: username.session.lastSeen,
         skin: username.skin,
         badges: groupBadges
       }
@@ -212,8 +208,8 @@ async function real_player(name, requester, realm) {
     if (requester) {
       sender = await User.findOne({_id: requester}).exec().then(async (own_user) => {
         let own_groups = await user_groups_id(own_user._id).then(async (userGroups) => {
-          return await Promise.map(userGroups[0].group, async (groups) => {
-            return await server_placeholder(realm.toLowerCase(), groups._id).then((group) => {
+          return await Promise.map(userGroups.groups, async (groups) => {
+            return await server_placeholder(realm.toLowerCase(), groups.group._id).then((group) => {
               return group;
             }).catch((err) => { console.log(err); });
           });
@@ -230,8 +226,8 @@ async function real_player(name, requester, realm) {
 
         return {
           _id: own_user._id,
-          real_name: own_user.username,
-          last_seen: own_user.last_seen,
+          real_name: own_user.display,
+          last_seen: own_user.session.lastSeen,
           disguised_name: own_user.disguise_actual,
           real_group: own_groups[0],
           disguise_group: disguise_placeholder_own
@@ -242,12 +238,12 @@ async function real_player(name, requester, realm) {
     return await User.findOne({disguise_lowercase: name.toLowerCase()}).then(async (disguised_user) => {
       if (!disguised_user) {
 
-        return await User.findOne({username_lowercase: name.toLowerCase()}).then(async (real_user) => {
+        return await User.findOne({username: name.toLowerCase()}).then(async (real_user) => {
           if (!real_user) return ({found: false});
 
           let real_groups = await user_groups_id(real_user._id).then(async (userGroups) => {
-            return await Promise.map(userGroups[0].group, async (groups) => {
-              return await server_placeholder(realm.toLowerCase(), groups._id).then((group) => {
+            return await Promise.map(userGroups.groups, async (groups) => {
+              return await server_placeholder(realm.toLowerCase(), groups.group._id).then((group) => {
                 return group;
               }).catch((err) => { console.log(err); });
             });
@@ -266,8 +262,8 @@ async function real_player(name, requester, realm) {
             sender: sender,
             disguised: false,
             friends: friends,
-            last_seen: real_user.last_seen,
-            real_name: real_user.username,
+            last_seen: real_user.session.lastSeen,
+            real_name: real_user.display,
             real_group: real_groups[0]
           }
         });
@@ -275,8 +271,8 @@ async function real_player(name, requester, realm) {
       } else {
 
         let target_groups = await user_groups_id(disguised_user._id).then(async (userGroups) => {
-          return await Promise.map(userGroups[0].group, async (groups) => {
-            return await server_placeholder(realm.toLowerCase(), groups._id).then((group) => {
+          return await Promise.map(userGroups.groups, async (groups) => {
+            return await server_placeholder(realm.toLowerCase(), groups.group._id).then((group) => {
               return group;
             }).catch((err) => { console.log(err); });
           });
@@ -303,8 +299,8 @@ async function real_player(name, requester, realm) {
           disguised: true,
           sender: sender,
           friends: friends,
-          real_name: disguised_user.username,
-          last_seen: disguised_user.last_seen,
+          real_name: disguised_user.display,
+          last_seen: disguised_user.session.lastSeen,
           disguised_name: disguised_user.disguise_actual,
           real_group: target_groups[0],
           disguise_group: disguise_placeholder_target
@@ -318,7 +314,7 @@ async function real_player(name, requester, realm) {
 
 async function user_groups_id(user) {
   try {
-    return await User.find({"_id" : user}).select({"group" : 1, "_id": 0});
+    return await User.findOne({"_id" : user}).select({"groups" : 1, "_id": 0});
   } catch(err) {
     console.log(err);
   }
@@ -332,17 +328,6 @@ function arithmetic_max_xp(level) {
 
 function arithmetic_remaining_xp(level, user_xp) {
   return arithmetic_max_xp(level) - user_xp;
-}
-
-function friend_create(id) {
-  let friend_document = new Friend();
-  friend_document.username = id;
-  friend_document.accepted = [];
-  friend_document.pending = [];
-  friend_document.settings.receive_requests = true;
-  friend_document.settings.friends_sorted = 1;
-  friend_document.settings.reversed = false;
-  friend_document.save(() => {});
 }
 
 function stats_create(id) {

@@ -2,7 +2,6 @@
 
 const AF = require("@auxiliar_functions");
 const bcrypt = require("bcrypt-nodejs");
-const Friend = require("@friend");
 const geoip = require("geoip-lite");
 const Group = require("@group");
 const mailer = require("@smtp_service");
@@ -21,19 +20,11 @@ module.exports = {
     if (Validator.isValid(req.params.username.toString())) {
       query = {_id: req.params.username};
     } else {
-      query = {username_lowercase: req.params.username.toLowerCase()};
+      query = {username: req.params.username.toLowerCase()};
     }
     User.findOne(query).populate("disguise_group").exec().then(async (user) => {
       if (!user) return res.status(404).send({message: "No se ha encontrado al jugador."});
-      let fixedUser = user.toObject();
-      fixedUser.group = await Promise.map(user.group, async (group) => {
-        return await Group.findOne({_id: group._id}).exec().then((g) => {
-            return g;
-        }).catch((err) => {
-          console.log(err);
-        });
-      });
-      return res.status(200).send(fixedUser);
+      return res.status(200).send(user);
     }).catch((er) => {
       console.log(er);
       return res.status(500).send({message: "Error obtaining user record."});
@@ -52,11 +43,11 @@ module.exports = {
     const Date = moment().unix();
     let params = req.body;
     // Find registered username
-    User.findOne({username_lowercase: params.username.toLowerCase()}, (err, user) => {
+    User.findOne({username: params.username.toLowerCase()}, (err, user) => {
       if (err) return res.status(500).send({message: "Error when pairing user with the server."});
       if (user) {
         // Find if user already registered
-        User.findByIdAndUpdate({_id: user._id}, {last_seen: 0}).populate("group._id disguise_group").exec((err, updated_login)  => {
+        User.findByIdAndUpdate({_id: user._id}, {sesion: {lastSeen: 0}}).populate("group._id disguise_group").exec((err, updated_login)  => {
           if (err) return res.status(500).send({message: "Error when pairing user with the server."});
           if (user.password) {
             delete user.password;
@@ -71,20 +62,19 @@ module.exports = {
           if (err) return res.status(500).send({message: "Error when pairing user with the server."});
           if (multi) {
             // Return related account
-            return res.status(200).send({multi: true, language: multi.language, account_details: {created_at: moment.unix(multi.member_since).format("MM/DD/YYYY"), username: multi.username}});
+            return res.status(200).send({multi: true, language: multi.language, account_details: {created_at: moment.unix(multi.createdAt).format("MM/DD/YYYY"), username: multi.username}});
           } else {
             // Create new user
             let user = new User();
             user.username = params.username;
-            user.username_lowercase = params.username.toLowerCase();
+            user.username = params.username.toLowerCase();
             user.skin = params.username;
-            user.last_seen = 0;
-            user.last_game = "registrandose";
-            user.member_since = Date;
+            user.session.lastSeen = 0;
+            user.session.lastGame = "registrandose";
             user.logged = "authenticating";
-            user.group.push({
-              _id: config.DEFAULT_GROUP,
-              add_date: Date
+            user.groups.push({
+              group: config.DEFAULT_GROUP,
+              joined: Date
             });
             user.save((err, saved_user) => {
               if (err) return res.status(500).send({message: "Error when pairing user with the server."});
@@ -113,7 +103,7 @@ module.exports = {
       if (geoip.lookup(params.ip) != null) ip = geoip.lookup(params.ip).country;
       bcrypt.hash(params.password, null, null, (err, hash) => {
         if (err || !hash) res.status(500).send({message: "Error while registering user."});
-        User.findOneAndUpdate({username_lowercase: params.username.toLowerCase()}, {$set: {password: hash, logged: "true"}, $push: {used_ips: {number: params.ip, country: ip.country, primary: true}}}, (err, userUpdated) => {
+        User.findOneAndUpdate({username: params.username.toLowerCase()}, {$set: {password: hash, logged: "true"}, $push: {address: {number: params.ip, country: ip.country, primary: true}}}, (err, userUpdated) => {
           if (err || !userUpdated) res.status(500).send({message: "Error while registering user."});
           return res.status(200).send({token: user_tokenization.createToken(userUpdated)});
         });
@@ -126,15 +116,15 @@ module.exports = {
   server_login: function(req, res) {
     const params = req.body;
     if (params.password && params.username && params.ip) {
-      User.findOne({username_lowercase: params.username.toLowerCase()}, (err, user) => {
+      User.findOne({username: params.username.toLowerCase()}, (err, user) => {
         if (err || !user) return res.status(500).send({message: "Ha ocurrido un error al validar la contraseña del usuario."});
         bcrypt.compare(params.password, user.password, (err, check) => {
           if (check) {
             user.logged = "true";
             user.save((err, saved) => {
               if (err || !saved) return res.status(400).send({message: "Invalid password."});
-              if (!user.used_ips.some(e => e.number === params.ip)) {
-                User.findByIdAndUpdate(user._id, {$push: {used_ips: {number: params.ip, country: params.ip.country, primary: false}}}, (err, updatedUser) => {
+              if (!user.address.some(e => e.number === params.ip)) {
+                User.findByIdAndUpdate(user._id, {$push: {address: {number: params.ip, country: params.ip.country, primary: false}}}, (err, updatedUser) => {
                   if (err || !updatedUser) return res.status(500).send({message: "Ha ocurrido un error al validar la contraseña del usuario."});
                   return res.status(200).send({logged: true});
                 });
@@ -153,7 +143,7 @@ module.exports = {
   },
 
   server_left: function(req, res) {
-    User.findOneAndUpdate({_id: req.user.sub}, {last_seen: moment().unix(), logged: "false"}, {new: true}, (err, user_updated)  => {
+    User.findOneAndUpdate({_id: req.user.sub}, {session: {lastSeen: moment().unix()}}, {new: true}, (err, user_updated)  => {
       if (!user_updated) return res.status(500).send({message: "Petición de desconexión incorrecta."});
       if (err) res.status(500).send({message: "Ha ocurrido un error desconectar al usuario de la base de datos."});
       return res.status(200).send({user: user_updated.username, disconnected: user_updated.last_seen});
@@ -174,7 +164,7 @@ module.exports = {
             let encodedMail = new Buffer(req.body.email).toString("base64");
             let encodedUser = new Buffer(req.body.username).toString("base64");
             let link = "http://" + req.get("host") + "/api/user/verify?mail=" + encodedMail + "&user=" + encodedUser + "&id=" + rand;
-            User.findOneAndUpdate({username_lowercase: req.body.username.toLowerCase()}, {email: req.body.email.toLowerCase(), verified: false}, (err, user) => {
+            User.findOneAndUpdate({username: req.body.username.toLowerCase()}, {email: req.body.email.toLowerCase(), verified: false}, (err, user) => {
               if (!user) {
                 return res.status(404).send({message: "No se ha encontrado el usuario a verificar"});
               } else {
@@ -202,7 +192,7 @@ module.exports = {
       if (err) return res.status(500).send({message: "redis_error"});
       if (reply === null) return res.status(500).send({message: "invalid_key"});
       if(reply === req.query.id) {
-        User.findOneAndUpdate({username_lowercase: decodedUser.toLowerCase(), email: decodedMail.toLowerCase()}, {verified: true}, (err, user) => {
+        User.findOneAndUpdate({username: decodedUser.toLowerCase(), email: decodedMail.toLowerCase()}, {verified: true}, (err, user) => {
           if (err || !user) {
             return res.redirect(config.FRONTEND_URL + "/login?verified=false");
           } else {
@@ -223,12 +213,12 @@ module.exports = {
 
   user_permissions: function(req, res) {
     try {
-      User.findOne({username_lowercase: req.body.username.toLowerCase()}, async (err, user) => {
+      User.findOne({username: req.body.username.toLowerCase()}, async (err, user) => {
         if(!user || err) return res.status(500).send({message: "No se ha encontrado a este usuario en la base de datos."});
         await AF.user_groups_id(user._id).then(async (groups) => {
           let permissions = [];
-          await Promise.map(groups[0].group, async (groups) => {
-            return await Group.findOne({_id: groups._id}).select({minecraft_permissions: 1, _id: 0}).then((group_permissions) => {
+          await Promise.map(groups.groups, async (groups) => {
+            return await Group.findOne({_id: groups.group._id}).select({minecraft_permissions: 1, _id: 0}).then((group_permissions) => {
               permissions.push.apply(permissions, group_permissions.minecraft_permissions);
             }).catch(() => {
               return res.status(500).send({message: "Ha ocurrido un error al obtener los permisos de este usuario."});
@@ -248,7 +238,7 @@ module.exports = {
   production_join: async function(req, res) {
     try {
       let params = req.body; if(!params.username || !params.realm) return res.status(500).send({message: "Ha ocurrido un error al obtener los datos del usuario."});
-      let user_data = await User.findOne({username_lowercase: params.username.toLowerCase()}).exec().then((user) => {
+      let user_data = await User.findOne({username: params.username.toLowerCase()}).exec().then((user) => {
         if (user) {
           return user;
         } else {
@@ -257,8 +247,8 @@ module.exports = {
       }).catch(() => {});
       if (!user_data) return res.status(404).send({message: "Ha ocurrido un error al encontrar el usuario en la base de datos."});
       let user_groups = await AF.user_groups_id(user_data._id).then(async (userGroups) => {
-        return await Promise.map(userGroups[0].group, async (groups) => {
-          return await AF.server_placeholder(params.realm.toLowerCase(), groups._id).then((group) => {
+        return await Promise.map(userGroups.groups, async (groups) => {
+          return await AF.server_placeholder(params.realm.toLowerCase(), groups.group._id).then((group) => {
             return group;
           }).catch(() => {});
         });
@@ -273,345 +263,14 @@ module.exports = {
         secondary_groups: secondary_groups,
         skin: user_data.skin,
         disguised: user_data.disguised,
-        member_since: user_data.member_since,
+        member_since: user_data.createdAt,
         logged: user_data.logged,
-        last_seen: user_data.last_seen,
+        last_seen: user_data.session.lastSeen,
         experience: user_data.experience,
         level: user_data.level,
         max_experience: max_experience
       });
     } catch(err) {
-      console.log(err);
-      return res.status(500).send({message: "Ha ocurrido un error al obtener los datos del usuario."});
-    }
-  },
-
-  // -- Group related functions --//
-
-  group_add: function(req, res) {
-    let params = req.body; if(!params.username || !params.group) return res.status(500).send({message: "Ha ocurrido un error al obtener los datos del grupo."});
-    Group.findOne({name: params.group}).select("_id", (err, group) => {
-      if (err) return res.status(200).send({updated: false, message: "Ha ocurrido un error al obtener el grupo."});
-      if (!group) {
-        return res.status(200).send({updated: false, message: "No se ha encontrado un grupo con este nombre."});
-      } else {
-        User.findOne({username_lowercase: params.username.toLowerCase()}, (err, user) => {
-          if (!user) {
-            return res.status(200).send({updated: false, message: "No se ha encontrado a este usuario en la base de datos."});
-          } else {
-            if (user.group.includes({_id: group._id})) {
-              return res.status(200).send({updated: false, message: "El usuario ya hace parte del grupo seleccionado."});
-            } else {
-              user.group.push({_id: group._id, add_date: moment().unix(), role_comment: params.group});
-              user.save((err, user) => {
-                if (err || !user) return res.status(500).send({updated: false, message: "Ha ocurrido un error al actualizar el usuario."});
-                return res.status(200).send({updated: true});
-              });
-            }
-          }
-        });
-      }
-    });
-  },
-
-  group_remove: function(req, res) {
-    let params = req.body; if (!params.username || !params.group) return res.status(500).send({message: "Ha ocurrido un error al obtener los datos del grupo."});
-    Group.findOne({name: params.group}).select("_id", (err, group) => {
-      if (err) return res.status(200).send({removed: false, message: "Ha ocurrido un error al obtener el grupo."});
-      if (!group) {
-        return res.status(200).send({removed: false, message: "No se ha encontrado un grupo con este nombre."});
-      } else {
-        User.findOne({username: params.username}, (err, user) => {
-          if (!user) {
-            return res.status(200).send({removed: false, message: "No se ha encontrado a este usuario en la base de datos."});
-          } else {
-            if (user.group.includes({"_id": group._id})) {
-              return res.status(200).send({removed: false, message: "El usuario ya hace parte del grupo seleccionado."});
-            } else {
-              user.group.pull({"_id": group._id});
-              user.save((err, user) => {
-                if (err || !user) return res.status(500).send({removed: false, message: "Ha ocurrido un error al actualizar el usuario."});
-                return res.status(200).send({removed: true});
-              });
-            }
-          }
-        });
-      }
-    });
-  },
-
-  disguise_user: function(req, res) {
-    if (!req.body.disguise_nick || !req.body.disguise_group) {
-      return res.status(200).send({can_use: "false", message: "command_disguise_error"});
-    } else {
-      let group;
-      if (req.body.disguise_group === "usuario") group = "5b52b2048284865491b1f56a";
-      if (req.body.disguise_group === "warlord") group = "5b5662c3a7d0508b8b153d8f";
-      if (req.body.disguise_group === "ghost") group = "5b5662d0a7d0508b8b153da3";
-      if (req.body.disguise_group === "shallow") group = "5b5662e7a7d0508b8b153dc7";
-      if (req.body.disguise_group === "zeno") group = "5b5662d9a7d0508b8b153db2";
-      User.findOneAndUpdate(
-        {_id: req.user.sub},
-        {disguised: true, disguise_actual: req.body.disguise_nick ,disguise_lowercase: req.body.disguise_nick.toLowerCase(), disguise_group: group, $push: {disguise_history: {nickname: req.body.disguise_nick.toLowerCase(), group: group, created_at: moment().unix()}}}, (err, disguised_user) => {
-          if (err) return res.status(200).send({nicked: "false", message: "command_disguise_error"});
-          if (!disguised_user) return res.status(200).send({nicked: "false", message: "command_disguise_notfound"});
-          return res.status(200).send({nicked: "true", message: "command_disguise_success"});});
-    }
-  },
-
-  disguise_namecheck: function(req, res) {
-    if (!req.body.disguise_nick) {
-      return res.status(200).send({can_use: "false", message: "command_disguise_error"});
-    } else {
-      User.findOne({username_lowercase: req.body.disguise_nick.toLowerCase()}, (err, user) => {
-        if (err) return res.status(200).send({can_use: "false", message: "command_disguise_error"});
-        if (!user) {
-          User.findOne({disguise_lowercase: req.body.disguise_nick.toLowerCase()}, (err, used) => {
-            if (err) return res.status(200).send({can_use: "false", message: "command_disguise_error"});
-            if (!used) {
-              return res.status(200).send({can_use: "true", message: "none"});
-            } else {
-              return res.status(200).send({can_use: "false", message: "command_disguise_used"});
-            }
-          });
-        } else {
-          return res.status(200).send({can_use: "false", message: "command_disguise_real"});
-        }
-      });
-    }
-  },
-
-  disguise_remove: function(req, res) {
-    User.findOneAndUpdate(
-        {_id: req.user.sub},
-        {disguised: false, disguise_actual: undefined, disguise_lowercase: undefined, disguise_group: undefined}, (err, undisguised) => {
-          if(err || !undisguised) return res.status(200).send({removed: "false", message: "command_disguise_error"});
-          return res.status(200).send({removed: "true", message: "command_disguise_undisguised"});
-        }
-    );
-  },
-
-  disguise_get_onjoin: async function(req, res) {
-    try {
-      if (!req.body.realm) {
-        return res.status(200).send({message: "Ha ocurrido un error al obtener los datos del usuario."});
-      } else {
-        await User.findOne({_id: req.user.sub}).exec().then(async (user) => {
-          if (!user) return res.status(200).send({message: "command_disguise_join_error"});
-          await AF.server_placeholder(req.body.realm, user.disguise_group).then((group) => {
-            return res.status(200).send({disguise: user.disguise_actual, group: group});
-          }).catch(() => {});
-        });
-      }
-    } catch(err) {
-      return res.status(200).send({message: "command_disguise_join_error"});
-    }
-  },
-
-  profile_command: async function(req, res) {
-    try {
-      console.log(req.user.sub);
-      User.findOne({_id: req.user.sub}, async (err, query_user) => {
-
-        // -- Base query request -- //
-
-        if (err) return res.status(200).send({query_success: "false", message: "profile_query_error"});
-        if (!query_user) {
-          return res.status(200).send({query_success: "false", message: "profile_query_notfound"});
-        } else {
-
-          // -- Get query player info -- //
-
-          let user_groups = await AF.user_groups_id(query_user._id).then(async (userGroups) => {
-            return await Promise.map(userGroups[0].group, async (groups) => {
-              return await AF.server_placeholder(req.body.realm.toLowerCase(), groups._id).then((group) => {
-                return group;
-              }).catch(() => {});
-            });
-          });
-
-          let disguise_placeholder;
-          if (query_user.disguise_group) {
-            disguise_placeholder = await AF.server_placeholder(req.body.realm.toLowerCase(), query_user.disguise_group).then((group) => {
-              return group;
-            }).catch(() => {});
-          }
-
-          let max_experience = AF.arithmetic_max_xp(query_user.level+1);
-          user_groups.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
-
-          if (!req.body.target) {
-
-            // -- Command without target request -- //
-
-            return res.status(200).send(
-                {
-                  query_success: "true",
-                  queried_disguised: "false",
-                  query_user: {
-                    username: query_user.username,
-                    language: query_user.language,
-                    main_group: user_groups[0],
-                    skin: query_user.skin,
-                    disguised: query_user.disguised,
-                    disguised_actual: query_user.disguise_actual,
-                    disguise_group: disguise_placeholder,
-                    member_since: query_user.member_since,
-                    last_seen: query_user.last_seen,
-                    experience: query_user.experience,
-                    level: query_user.level,
-                    max_experience: max_experience
-                  }
-                }
-            );
-          } else {
-
-            // -- Find if target player is a disguise -- //
-
-            User.findOne({disguise_lowercase: req.body.target.toLowerCase()}, async (err, query_disguised) => {
-              if (err) return res.status(200).send({query_success: "false", message: "profile_query_error"});
-              if (!query_disguised) {
-
-                // -- Find real user with target name -- //
-
-                User.findOne({username_lowercase: req.body.target.toLowerCase()}, async (err, query_target) => {
-                  if (err) return res.status(200).send({query_success: "false", message: "profile_query_error"});
-                  if(!query_target) return res.status(200).send({query_success: "false", message: "profile_query_notfound"});
-
-                  let target_groups = await AF.user_groups_id(query_target._id).then(async (userGroups) => {
-                    return await Promise.map(userGroups[0].group, async (groups) => {
-                      return await AF.server_placeholder(req.body.realm.toLowerCase(), groups._id).then((group) => {
-                        return group;
-                      }).catch(() => {});
-                    });
-                  });
-
-                  let disguise_placeholder_target;
-                  if (query_target.disguise_group) {
-                    disguise_placeholder_target = await AF.server_placeholder(req.body.realm.toLowerCase(), query_target.disguise_group).then((group) => {
-                      return group;
-                    }).catch(() => {});
-                  }
-
-                  let are_friends = await Friend.findOne({username: query_target._id, accepted: {$in: [query_user._id]}}).exec().then((are_friends) => {
-                    if (!are_friends) return "false";
-                    return "true";
-                  }).catch(() => {
-                    return "false";
-                  });
-
-                  let max_experience_target = AF.arithmetic_max_xp(query_target.level+1);
-                  target_groups.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
-
-                  return res.status(200).send(
-                      {
-                        query_success: "true",
-                        queried_disguised: "false",
-                        are_friends: are_friends,
-                        query_user: {
-                          username: query_user.username,
-                          language: query_user.language,
-                          main_group: user_groups[0],
-                          skin: query_user.skin,
-                          disguised: query_user.disguised,
-                          disguised_actual: query_user.disguise_actual,
-                          disguise_group: disguise_placeholder,
-                          member_since: query_user.member_since,
-                          last_seen: query_user.last_seen,
-                          experience: query_user.experience,
-                          level: query_user.level,
-                          max_experience: max_experience
-                        },
-                        query_target: {
-                          username: query_target.username,
-                          language: query_target.language,
-                          main_group: target_groups[0],
-                          skin: query_target.skin,
-                          disguised: query_target.disguised,
-                          disguised_actual: query_target.disguise_actual,
-                          disguise_group: disguise_placeholder_target,
-                          member_since: query_target.member_since,
-                          last_seen: query_target.last_seen,
-                          experience: query_target.experience,
-                          level: query_target.level,
-                          max_experience: max_experience_target
-                        }
-                      }
-                  );
-                });
-
-              } else {
-
-                // -- Send target disguised player with real name -- //
-
-                let disguise_groups = await AF.user_groups_id(query_disguised._id).then(async (userGroups) => {
-                  return await Promise.map(userGroups[0].group, async (groups) => {
-                    return await AF.server_placeholder(req.body.realm.toLowerCase(), groups._id).then((group) => {
-                      return group;
-                    }).catch(() => {});
-                  });
-                });
-
-                let disguise_placeholder_disguised;
-                if (query_disguised.disguise_group) {
-                  disguise_placeholder_disguised = await AF.server_placeholder(req.body.realm.toLowerCase(), query_disguised.disguise_group).then((group) => {
-                    return group;
-                  }).catch(() => {});
-                }
-
-                let are_friends = await Friend.findOne({username: query_disguised._id, accepted: {$in: [query_user._id]}}).exec().then((are_friends) => {
-                  if (!are_friends) return "false";
-                  return "true";
-                }).catch(() => {
-                  return "false";
-                });
-
-                let max_experience_disguised = AF.arithmetic_max_xp(query_disguised.level+1);
-                disguise_groups.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
-
-                return res.status(200).send(
-                    {
-                      query_success: "true",
-                      queried_disguised: "true",
-                      are_friends: are_friends,
-                      query_user: {
-                        username: query_user.username,
-                        language: query_user.language,
-                        main_group: user_groups[0],
-                        skin: query_user.skin,
-                        disguised: query_user.disguised,
-                        disguised_actual: query_user.disguise_actual,
-                        disguise_group: disguise_placeholder,
-                        member_since: query_user.member_since,
-                        last_seen: query_user.last_seen,
-                        experience: query_user.experience,
-                        level: query_user.level,
-                        max_experience: max_experience
-                      },
-                      query_target: {
-                        username: query_disguised.username,
-                        language: query_disguised.language,
-                        main_group: disguise_groups[0],
-                        skin: query_disguised.skin,
-                        disguised: query_disguised.disguised,
-                        disguised_actual: query_disguised.disguise_actual,
-                        disguise_group: disguise_placeholder_disguised,
-                        member_since: query_disguised.member_since,
-                        last_seen: query_disguised.last_seen,
-                        experience: query_disguised.experience,
-                        level: query_disguised.level,
-                        max_experience: max_experience_disguised
-                      }
-                    }
-                );
-              }
-            });
-
-          }
-        }
-      });
-
-    } catch (err) {
       console.log(err);
       return res.status(500).send({message: "Ha ocurrido un error al obtener los datos del usuario."});
     }

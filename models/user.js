@@ -5,82 +5,85 @@ let Schema = mongoose.Schema;
 
 let UserSchema = Schema({
   // -- Mandatory fields -- //
-  username: String,
-  username_lowercase: String,
-  email: String,
+  username: {
+    type: String,
+    index: true,
+    unique: true,
+    lowercase: true
+  },
+  display: String,
+  email: {
+    type: String,
+    lowercase: true,
+    unique: true,
+    index: true
+  },
   password: String,
-  group: [{
-    _id: {type: Schema.ObjectId, ref: 'Group'},
-    add_date: String,
-    role_comment: String
+  salt: String,
+  groups: [{
+    _id: false,
+    group: {
+      type: Schema.Types.ObjectId,
+      ref: 'Group',
+      autopopulate: true
+    },
+    joined: Schema.Types.Date,
+    comment: String
   }],
   // -- Automatic fields -- //
   skin: { type: String, default: "Steve" },
-  last_seen: String,
-  last_game: {type: String, default: "main_lobby"},
-  main_lobby: {type: String, default: "main_lobby"},
-  member_since: Number,
+  session: {
+    lastSeen: Number,
+    lastGame: String,
+    lastLobby: String,
+    premium: Boolean
+  },
   verified: { type: Boolean, default: false },
   level: { type: Number, default: 1 },
   experience: { type: Number, default: 1 },
-  used_ips: [{
+  address: [{
     _id: false,
     number: String,
     country: String,
     primary: Boolean
   }],
-  premium: {type: Boolean, default: false},
   discord: {
     id: String,
-    accessToken: String,
-    refreshToken: String,
-    tokenTimestamp: String
+    access: String,
+    refresh: String,
+    stamp: String
   },
-  logged: String,
-  // -- Disguise fields  -- //
-  disguised: { type: Boolean, default: false },
-  disguise_actual: String,
-  disguise_lowercase: String,
-  disguise_group: {
-    type: Schema.ObjectId,
-    ref: 'Group'
-  },
-  disguise_history: [{
-    _id: false,
-   nickname: String,
-   group: {
-     type: Schema.ObjectId,
-     ref: 'Group'
-   },
-   created_at: String
-  }],
   // -- Customizable fields -- //
   language: { type: String, enum: ['es', 'en', 'fr'], default: "es"},
-  gender: {
-    type: Number,
-    default: 0
+  publicInfo: {
+    gender: Number,
+    occupation: String,
+    interests: String,
+    email: String,
+    twitter: String,
+    reddit: String,
+    steam: String,
+    twitch: String,
+    about: String
   },
-  occupation: String,
-  location: String,
-  interests: String,
-  public_email: String,
-  twitter: String,
-  reddit: String,
-  steam: String,
-  twitch: String,
-  about: String,
-  // -- Settings fields -- //
-  ac_active: {type: Boolean, default: false},
-  ac_logs: {type: Boolean, default: false},
-  ac_punishments: {type: Boolean, default: false},
-  subscribe_topics: { type: Boolean, default: false },
-  alert_quoted: { type: Boolean, default: false },
-  accept_gifts: { type: Boolean, default: false },
-  accept_friends : { type: Boolean, default: false },
-  accept_parties: { type: Boolean, default: false },
-  show_status: { type: Boolean, default: false },
-  receive_requests: { type: Boolean, default: true },
-  hiding_players: { type: Boolean, default: false}
+  settings: {
+    adminChat: {
+      active: Boolean,
+      logs: Boolean,
+      punishments: Boolean
+    },
+    general: {
+      gifts: Boolean,
+      friends: Boolean,
+      parties: Boolean,
+      status: Boolean,
+      hiding: Boolean
+    },
+    forum: {
+      subscribe: Boolean,
+      quoteAlert: Boolean
+    }
+  }
 });
 
 module.exports = mongoose.model('User', UserSchema);
