@@ -11,6 +11,7 @@ const Promise = require ("bluebird");
 const config = require("../config");
 const redis = require("@redis_service");
 const User = require("@user");
+const argon = require("argon2");
 
 module.exports = {
 
@@ -20,16 +21,14 @@ module.exports = {
   },
 
   login_user: function(req, res) {
-    User.findOne({email: req.body.email}, (err, user) => {
+    User.findOne({email: req.body.email}, async (err, user) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al iniciar sesión."});
       if(user) {
-        bcrypt.compare(req.body.password, user.password, (err, check) => {
-          if (check) {
-            return res.status(200).send({token: jwt.createToken(user, req.body.persistence)});
-          } else {
-            return res.status(404).send({message: "Ha ocurrido un error al procesar tu contraseña."});
-          }
-        });
+        if (await argon.verify(user.password, req.body.password)) {
+          return res.status(200).send({token: jwt.createToken(user, req.body.persistence)});
+        } else {
+          return res.status(404).send({message: "Ha ocurrido un error al procesar tu contraseña."});
+        }
       } else {
         return res.status(404).send({message: "El correo electrónico o la contraseña son incorrectos."});
       }
