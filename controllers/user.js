@@ -97,19 +97,8 @@ module.exports = {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el prefix del usuario."});
       if (!user) return res.status(404).send({message: "No se ha encontrado el usuario solicitado."});
 
-      let badges = [];
-      try {
-        badges =await Promise.map(user.group, async (groups) => {
-          return await Group.findOne({_id : groups._id}).exec().then((group) => {
-            return group;
-          });
-        });
-      } catch (err) {
-
-      }
-
+      let badges = user.groups;
       console.log(badges);
-
       badges.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
 
       return res.status(200).send({
