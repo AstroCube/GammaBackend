@@ -108,6 +108,8 @@ module.exports = {
 
       }
 
+      console.log(badges);
+
       badges.sort((a, b) => parseFloat(a.priority) - parseFloat(b.priority));
 
       return res.status(200).send({
