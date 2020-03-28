@@ -23,6 +23,7 @@ function fixId(object) {
 async function local_permission(user, permission) {
   try {
     let user_groups = await user_groups_id(user).then(async (groups) => {
+      console.log(groups);
       return await Promise.map(groups.groups, (ids) => {
         return ids.group._id;
       });
@@ -314,7 +315,7 @@ async function real_player(name, requester, realm) {
 
 async function user_groups_id(user) {
   try {
-    return await User.findOne({"_id" : user}).select({"groups" : 1, "_id": 0});
+    return await User.findOne({_id: user}).select({groups: 1, _id: 0});
   } catch(err) {
     console.log(err);
   }
