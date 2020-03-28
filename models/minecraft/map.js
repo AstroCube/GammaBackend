@@ -37,8 +37,7 @@ let MapSchema = Schema({
         ref: 'User'
       }
     }
-  ],
-  registeredDate: String
+  ]
 });
 
 module.exports = mongoose.model('Map', MapSchema);

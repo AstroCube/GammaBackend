@@ -8,8 +8,7 @@ const secret = config.TOKENIZATION_SECRET;
 
 exports.createToken = function(server) {
   let payload = {
-    sub: server._id,
-    created_at: moment().unix()
+    _id: server._id
   };
   return jwt.encode(payload, secret);
 };

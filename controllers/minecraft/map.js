@@ -29,7 +29,6 @@ module.exports = {
           map.subGamemode = params.subGamemode;
           map.description = params.description;
           map.rating = params.rating;
-          map.registeredDate = moment().unix();
 
           // --- Image creation --- //
           const serialization = Math.floor(Math.random() * 255);
@@ -132,7 +131,7 @@ module.exports = {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener el mapa."});
       if (!map) return res.status(404).send({message: "No se ha encontrado el mapa."});
       let fixedMap = map.toObject();
-      if (!req.user.sub) {
+      if (!req.user._id) {
         delete fixedMap.file;
         delete fixedMap.configuration;
       }

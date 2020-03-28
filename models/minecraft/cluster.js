@@ -5,8 +5,13 @@ let mongoose = require("mongoose");
 let Schema = mongoose.Schema;
 
 let ClusterSchema = Schema({
-  name: String,
-  created_at: String
-});
+      name: {
+        type: String,
+        unique: true,
+        lowercase: true
+      }
+    },
+    { timestamps: true }
+);
 
 module.exports = Promise.promisifyAll(mongoose.model('Cluster', ClusterSchema));

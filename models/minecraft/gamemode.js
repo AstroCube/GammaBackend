@@ -4,21 +4,21 @@ let mongoose = require("mongoose");
 let Schema = mongoose.Schema;
 
 let GamemodeSchema = Schema({
-  name: String,
-  scoreboard: String,
-  lobby: String,
-  navigator: String,
-  slot: Number,
-  sub_types: [{
-    _id: false,
-    name: String,
-    scoreboard: String,
-    selectable_map: String,
-    min_players: Number,
-    max_players: Number,
-    permission: String,
-    group: String
-  }],
-});
+      name: String,
+      lobby: String,
+      navigator: String,
+      slot: Number,
+      subTypes: [{
+        _id: false,
+        name: String,
+        selectableMap: String,
+        minPlayers: Number,
+        maxPlayers: Number,
+        permission: String,
+        group: String
+      }]
+    },
+    { timestamps: true }
+);
 
 module.exports = mongoose.model('Gamemode', GamemodeSchema);
