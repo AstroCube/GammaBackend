@@ -223,6 +223,7 @@ module.exports = {
       if(!req.params.id) { id = req.user.sub; } else { id = req.params.id; }
       await User.findOne({"_id": id}).select("discord").exec().then(async (user) => {
         await discordUserFetch(user._id).then((user_data) => {
+          console.log(user_data);
           return res.status(200).send({
             username: user_data.username,
             discriminator: user_data.discriminator,

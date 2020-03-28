@@ -23,7 +23,6 @@ function fixId(object) {
 async function local_permission(user, permission) {
   try {
     let user_groups = await user_groups_id(user).then(async (groups) => {
-      console.log(groups);
       return await Promise.map(groups.groups, (ids) => {
         return ids.group._id;
       });
