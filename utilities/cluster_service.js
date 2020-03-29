@@ -1,6 +1,6 @@
 "use strict";
 
-const jwt_e = require("express-jwt");
+const jwt_e = require("jsonwebtoken");
 
 const config = require("../config");
 const secret = config.TOKENIZATION_SECRET;

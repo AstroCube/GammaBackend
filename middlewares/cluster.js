@@ -1,7 +1,6 @@
 "use strict";
 
-const jwt = require("jwt-simple");
-const moment = require("moment");
+const jwt = require("express-jwt");
 const config = require("../config");
 
 const getTokenFromHeader = req => {
