@@ -1,14 +1,15 @@
 "use strict";
 
-const jwt = require("jwt-simple");
-const moment = require("moment");
+const jwt_e = require("express-jwt");
 
 const config = require("../config");
 const secret = config.TOKENIZATION_SECRET;
 
 exports.createToken = function(server) {
-  let payload = {
-    _id: server._id
-  };
-  return jwt.encode(payload, secret);
+  return jwt_e.sign(
+      {
+        _id: server
+      },
+      secret
+  );
 };

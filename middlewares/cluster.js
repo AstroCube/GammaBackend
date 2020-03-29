@@ -4,29 +4,19 @@ const jwt = require("jwt-simple");
 const moment = require("moment");
 const config = require("../config");
 
-exports.ensureAuth = function(req, res, next) {
-
-  if (!req.headers.authorization) {
-    return res.status(403).send({message: 'No se ha dado ningun Token de autenticación.'});
+const getTokenFromHeader = req => {
+  if (
+      (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Token') ||
+      (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer')
+  ) {
+    return req.headers.authorization.split(' ')[1];
   }
-
-  let token = req.headers.authorization.replace (/['"]+/g, '');
-
-  try {
-    var payload = jwt.decode(token, config.TOKENIZATION_SECRET);
-
-    if(payload.exp <= moment().unix()) {
-      return res.status(401).send({
-        message: 'El token de autenticación ha expirado.'
-      });
-    }
-  } catch(ex){
-    return res.status(404).send({
-      message: 'El token de autenticación no es valido.'
-    });
-  }
-
-  req.server = payload;
-  next();
-
+  return null;
 };
+
+
+exports.ensureAuth = jwt({
+  secret: config.TOKENIZATION_SECRET,
+  userProperty: 'token',
+  getToken: getTokenFromHeader,
+});

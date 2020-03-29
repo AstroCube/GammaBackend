@@ -47,7 +47,7 @@ module.exports = {
       if (err) return res.status(500).send({message: "Error when pairing user with the server."});
       if (user) {
         // Find if user already registered
-        User.findByIdAndUpdate({_id: user._id}, {sesion: {lastSeen: 0}}).populate("group._id disguise_group").exec((err, updated_login)  => {
+        User.findByIdAndUpdate({_id: user._id}, {session: {lastSeen: 0}}).populate("group._id disguise_group").exec((err, updated_login)  => {
           if (err) return res.status(500).send({message: "Error when pairing user with the server."});
           if (user.password) {
             delete user.password;
