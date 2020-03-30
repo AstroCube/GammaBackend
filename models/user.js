@@ -33,7 +33,7 @@ let UserSchema = Schema({
   // -- Automatic fields -- //
   skin: { type: String, default: "Steve" },
   session: {
-    lastSeen: Number,
+    lastSeen: { type: Date, default: Date.now },
     online: { type: Boolean, default: false },
     lastGame: String,
     lastLobby: String,
