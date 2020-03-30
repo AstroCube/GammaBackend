@@ -26,6 +26,7 @@ module.exports = {
         server.matches = [];
         server.save((err, server) => {
           if (err || !server) return res.status(500).send({message: "Ha ocurrido un error al iniciar el servidor."});
+          console.log(err);
           return res.status(200).send({server: server, token: cluster_token.createToken(server)});
         });
       });
