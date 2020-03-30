@@ -59,7 +59,7 @@ module.exports = {
   },
 
   disconnectServer: function(req, res) {
-    Server.findOneAndDelete({"_id": req.server.sub}, (err) => {
+    Server.findOneAndDelete({"_id": req.server._id}, (err) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al desconectar el servidor"});
       return res.status(200).send({message: "Desconexión exitosa."});
     });
