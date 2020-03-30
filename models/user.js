@@ -34,6 +34,7 @@ let UserSchema = Schema({
   skin: { type: String, default: "Steve" },
   session: {
     lastSeen: Number,
+    online: { type: Boolean, default: false },
     lastGame: String,
     lastLobby: String,
     premium: Boolean
