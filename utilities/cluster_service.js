@@ -8,7 +8,7 @@ const secret = config.TOKENIZATION_SECRET;
 exports.createToken = function(server) {
   return jwt_e.sign(
       {
-        _id: server
+        _id: server._id
       },
       secret
   );
