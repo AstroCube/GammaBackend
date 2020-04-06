@@ -26,7 +26,7 @@ let MapSchema = Schema({
     type: Schema.ObjectId,
     ref: 'Gamemode'
   },
-  subGamemode: String,
+  subGamemode: [String],
   description: String,
   rating: [
     {
