@@ -90,13 +90,25 @@ let StatsSchema = Schema({
     deaths: {type: Number, default: 0},
     coins: { type: Number, default: 0 },
     kits: [
-        String
+      {
+        type: String,
+        default: ['glass']
+      }
     ],
     cages: [
-        String
+      {
+        type: String,
+        default: ['naturalist']
+      }
     ],
-    currentKit: String,
-    currentCage: String
+    currentKit: {
+      type: String,
+      default: 'naturalist'
+    },
+    currentCage: {
+      type: String,
+      default: 'glass'
+    }
   },
   tntGames: {
     runDoubleJump: {type: Number, default: 2},
