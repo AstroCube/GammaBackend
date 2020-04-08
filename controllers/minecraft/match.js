@@ -74,7 +74,7 @@ module.exports = {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al remover los mapas."});
       if (!server) return res.status(404).send({message: "No se encuentra el servidor especificado."});
 
-      if (server.type !== "game" || server.matches.length <= 0) return res.status(400).send({message: "El servidor no tiene partidas para cerrar."});
+      if (server.type !== "Game" || server.matches.length <= 0) return res.status(200).send({success: true});
 
       server.matches.map((match) => {
         Match.findOne({_id: match}, (err, matchRecord) => {
