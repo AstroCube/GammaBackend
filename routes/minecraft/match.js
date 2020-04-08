@@ -14,6 +14,6 @@ api.get("/match/get-website/:id", mdAuth.ensureAuth, MatchController.matchGetWeb
 api.get("/match/get-user/:user", mdAuth.ensureAuth, MatchController.matchGetPlayer);
 api.put("/match/update/:id", clusterAuth.ensureAuth, MatchController.matchUpdate);
 api.post("/match/get-win", clusterAuth.ensureAuth, MatchController.userWonMatches);
-api.get("/match/clean", clusterAuth.ensureAuth, MatchController.matchCleanup);
+api.get("/match/clean/:id", clusterAuth.ensureAuth, MatchController.matchCleanup);
 
 module.exports = api;

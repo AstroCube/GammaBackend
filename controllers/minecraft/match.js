@@ -70,7 +70,7 @@ module.exports = {
   },
 
   matchCleanup: function(req, res) {
-    Server.findOne({_id: req.currentServer._id}, (err, server) => {
+    Server.findOne({_id: req.params.id}, (err, server) => {
       if (err) return res.status(500).send({message: "Ha ocurrido un error al remover los mapas."});
       if (!server) return res.status(404).send({message: "No se encuentra el servidor especificado."});
 
