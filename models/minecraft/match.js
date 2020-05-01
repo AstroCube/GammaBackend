@@ -27,7 +27,7 @@ let MatchSchema = Schema(
         type: Schema.Types.ObjectId,
         ref: 'User'
       }],
-      status: { type: String, enum: ['waiting', 'starting', 'ingame', 'finished', 'invalidated', 'forced']},
+      status: { type: String, enum: ['waiting', 'starting', 'ingame', 'finished', 'preparing', 'invalidated', 'forced']},
       gamemode: {
         type: Schema.Types.ObjectId,
         ref: 'Gamemode'
