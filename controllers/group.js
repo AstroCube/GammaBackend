@@ -15,7 +15,7 @@ module.exports = {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener al usuario."});
         if (!user) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
 
-        if (user.group.some(e => e._id.toString() === params.group.toString())) return res.status(400).send({message: "El usuario ya se encuentra en el grupo"});
+        if (user.groups.some(e => e._id.toString() === params.group.toString())) return res.status(400).send({message: "El usuario ya se encuentra en el grupo"});
 
         user.groups.push(
             {
@@ -39,14 +39,14 @@ module.exports = {
 
     let params = req.body;
 
-    if (params.group) {
+    if (params.groups) {
       User.findOne({_id: req.params.id}, (err, user) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al obtener al usuario."});
         if (!user) return res.status(404).send({message: "No se ha encontrado el usuario a actualizar."});
 
-        if (!user.group.some(e => e.group.toString() === params.group.toString())) return res.status(400).send({message: "El usuario no se encuentra dentro del grupo."});
+        if (!user.groups.some(e => e.group.toString() === params.group.toString())) return res.status(400).send({message: "El usuario no se encuentra dentro del grupo."});
 
-        user.group = user.group.filter((group) => group.group.toString() !== params.group.toString());
+        user.groups = user.groups.filter((group) => group.group.toString() !== params.group.toString());
         user.save((err, updatedUser) => {
           if (err || !updatedUser) return res.status(500).send({message: "Ha ocurrido un error al actualizar el usuario."});
           return res.status(200).send(updatedUser);
