@@ -5,7 +5,9 @@ Este repositorio contiene el código esencial para que todos los servicios que e
 
 # Licencia
 
-Cabe destacarse que al ingresar a la división de desarrollo se ha firmado obligatoriamente un contrato de confidencialidad, por lo que cualquier información contenida en este repositorio, no podrá ser divulgada a terceros. Sientente totalmente libre de bifurcar este repositorio, y crear snippets privadamente, o en este grupo. Cualquier intento de divulgación a personas externas a SEOCRAFT NETWORK S.A.S, será penalizada legalmente de acuerdo a la [Decisión 486 del año 2000 - Artículo 257](http://www.wipo.int/edocs/lexdocs/laws/es/can/can012es.pdf).
+El código dentro de este repositorio no debe ser difundido a cualquier persona ajéna a Seocraft Network.
+Una vez otorgado el acceso al mismo, el usuario aceptará todas las responsabilidades legales/administrativas
+de incumplir con lo anterior Cualquier intento de divulgación a personas externas a Seocraft Network y/o personas autorizadas por la misma entidad, será penalizada legalmente de acuerdo a la [Decisión 486 del año 2000 - Artículo 257](http://www.wipo.int/edocs/lexdocs/laws/es/can/can012es.pdf).
 
 # Arquitectura
 
