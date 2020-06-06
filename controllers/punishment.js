@@ -33,7 +33,7 @@ module.exports = {
       punishment.save((err, punishment_stored) => {
         if (err) return res.status(500).send({message: "Ha ocurrido un error al guardar la sanción."});
         if (req.params.report) {
-          let action = new Action({type: "punish", username: req.user.sub, realm: "report", created_at: moment().unix()});
+          let action = new Action({type: "punish", username: req.user.sub, realm: "report", created_at: momen t().unix()});
           action.save((err, action_saved) => {
             if (err || !action_saved) return res.status(500).send({message: "Ha ocurrido un error al actualizar el reporte."});
             Report.findOneAndUpdate({_id: req.params.report}, {closed: true, punishment: punishment_stored._id, $push: {actions: action_saved._id}}, (err, report_updated) => {

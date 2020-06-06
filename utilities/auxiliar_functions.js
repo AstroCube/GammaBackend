@@ -46,7 +46,7 @@ async function file_unlink(path) {
 async function dynamic_permission(user, permission, text) {
   try {
     let user_groups = await user_groups_id(user).then(async (groups) => {
-      return await Promise.map(groups.groups, (ids) => {
+      return await Promise.map(groups, (ids) => {
         return ids.group._id;
       });
     }).catch((err) => {
