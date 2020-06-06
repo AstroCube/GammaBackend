@@ -11,7 +11,6 @@ const app = express();
 
 let user_routes = require("./routes/user");
 let group_routes = require("./routes/group");
-let punishment_routes = require("./routes/punishment");
 let alert_routes = require("./routes/alert");
 let appeal_routes = require("./routes/appeal");
 let report_routes = require("./routes/report");
@@ -52,7 +51,6 @@ app.use((req, res, next) => {
 app.use('/api', alert_routes);
 app.use('/api', user_routes);
 app.use('/api', group_routes);
-app.use('/api', punishment_routes);
 app.use('/api', report_routes);
 app.use('/api', friend_routes);
 
