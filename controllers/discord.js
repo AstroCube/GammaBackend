@@ -221,7 +221,7 @@ module.exports = {
     try {
       let id;
       if(!req.params.id) { id = req.user.sub; } else { id = req.params.id; }
-      await User.findOne({"_id": id}).select("discord").exec().then(async (user) => {
+      await User.findOne({_id: id}).select("discord").exec().then(async (user) => {
         await discordUserFetch(user._id).then((user_data) => {
           return res.status(200).send({
             username: user_data.username,
